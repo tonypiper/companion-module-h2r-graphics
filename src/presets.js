@@ -3,10 +3,10 @@ import { graphicToReadableLabel, graphicColours, graphicIcons, replaceWithDataSo
 
 export const initPresets = (self) => {
 	const presets = {}
-	let SELECTED_PROJECT_GRAPHICS = self.SELECTED_PROJECT_GRAPHICS || []
-	let SELECTED_PROJECT_VARIABLES = self.SELECTED_PROJECT_VARIABLES || {}
+	const SELECTED_PROJECT_GRAPHICS = self.SELECTED_PROJECT_GRAPHICS || []
+	const SELECTED_PROJECT_VARIABLES = self.SELECTED_PROJECT_VARIABLES || {}
 
-	presets['Run'] = {
+	presets.Run = {
 		type: 'button',
 		category: 'Basic actions',
 		name: 'Run',
@@ -29,7 +29,7 @@ export const initPresets = (self) => {
 		feedbacks: [],
 	}
 
-	presets['Hide'] = {
+	presets.Hide = {
 		type: 'button',
 		category: 'Basic actions',
 		name: 'Hide all graphics',
@@ -53,9 +53,9 @@ export const initPresets = (self) => {
 	}
 
 	const createPresetShowHide = (category, item) => {
-		let bgColour = graphicColours(item.type).bgColour
-		let pngIcon = graphicIcons(item.type).png
-		let labelSource = ['lower_third', 'lower_third_animated'].includes(item.type)
+		const bgColour = graphicColours(item.type).bgColour
+		const pngIcon = graphicIcons(item.type).png
+		const labelSource = ['lower_third', 'lower_third_animated'].includes(item.type)
 			? self.config.lowerThirdPresetLabelSource || 'contents'
 			: 'contents'
 

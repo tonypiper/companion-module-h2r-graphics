@@ -1,5 +1,5 @@
 import { combineRgb } from '@companion-module/base'
-import { graphicToReadableLabel } from './utils.js'
+import { graphicToReadableLabel } from './variables.js'
 
 const GRAPHIC_STATUS_OPTIONS = [
 	{ id: 'ready', label: 'Ready' },
@@ -11,11 +11,11 @@ const GRAPHIC_STATUS_OPTIONS = [
 	{ id: 'offair', label: 'Off air' },
 ]
 
-export const initFeedbacks = (self) => {
-	let SELECTED_PROJECT_GRAPHICS = self.SELECTED_PROJECT_GRAPHICS || []
+export const initFeedbacks = (graphics = []) => {
 	const feedbacks = {}
 
-	feedbacks['graphic_status'] = {
+
+	feedbacks.graphic_status = {
 		type: 'boolean', // Feedbacks can either a simple boolean, or can be an 'advanced' style change (until recently, all feedbacks were 'advanced')
 		name: 'Graphic status',
 		defaultStyle: {
@@ -35,27 +35,27 @@ export const initFeedbacks = (self) => {
 				type: 'dropdown',
 				label: 'Graphic',
 				id: 'graphicId',
-				default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
-				choices: [
-					...SELECTED_PROJECT_GRAPHICS.map((c) => {
-						const { id, label } = graphicToReadableLabel(c)
-						return {
-							id,
-							label,
-						}
-					}),
-				],
+				default: graphics.length > 0 ? graphics[0].id : '',
+				choices: choices(graphics),
 			},
 		],
-		callback: function (feedback) {
-			let status = self.SELECTED_PROJECT_GRAPHICS.find((g) => g.id === feedback?.options?.graphicId)?.status
+		callback(feedback) {
+			const status = graphics.find((graphic) => graphic.id === feedback?.options?.graphicId)?.status
 			// This callback will be called whenever companion wants to check if this feedback is 'active' and should affect the button style
-			if (status === feedback.options.status) {
-				return true
-			} else {
-				return false
-			}
+			return status === feedback.options.status;
 		},
 	}
 	return feedbacks
 }
+
+function choices(graphics) {
+	return [
+		...graphics.map((graphic) => {
+			const { id, label } = graphicToReadableLabel(graphic)
+			return {
+				id,
+				label,
+			}
+		}),
+	];
+} 

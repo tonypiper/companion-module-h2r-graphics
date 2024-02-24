@@ -6,9 +6,6 @@ import { initPresets } from './src/presets.js'
 import { initFeedbacks } from './src/feedback.js'
 
 class H2RGraphicsInstance extends InstanceBase {
-	constructor(internal) {
-		super(internal)
-	}
 
 	async init(config) {
 		this.config = config
@@ -105,7 +102,7 @@ class H2RGraphicsInstance extends InstanceBase {
 		this.setPresetDefinitions(presets)
 	}
 	updateFeedbacks() {
-		const feedbacks = initFeedbacks(this)
+		const feedbacks = initFeedbacks(this.SELECTED_PROJECT_GRAPHICS)
 		this.log('debug', JSON.stringify(feedbacks))
 		this.setFeedbackDefinitions(feedbacks)
 	}

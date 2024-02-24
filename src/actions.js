@@ -1,6 +1,7 @@
 import got from 'got'
 
-import { graphicToReadableLabel, stringToMS } from './utils.js'
+import { stringToMS } from './utils.js'
+import { graphicToReadableLabel } from './variables.js'
 
 const GRAPHIC_STATUS_TOGGLES = [
 	{ id: 'coming', label: 'Show' },

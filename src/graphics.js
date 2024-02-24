@@ -8,7 +8,7 @@ function isRunning(graphic) {
 	return ['running'].includes(graphic.state)
 }
 
-const GraphicTypes = {
+export const GraphicTypes = {
 	LowerThird: 'lower_third',
 	Message: 'message',
 	Time: 'time',
@@ -35,7 +35,7 @@ const GraphicTypes = {
 	Map: 'map',
 }
 
-const TimerTypes = {
+export const TimerTypes = {
 	Countdown: 'countdown',
 	Countup: 'countup',
 	TimeOfDay: 'time_of_day',
@@ -43,10 +43,10 @@ const TimerTypes = {
 }
 
 export function findGraphic(type) {
-	return graphics[type] || graphics['default']
+	return Graphics[type] || Graphics['default']
 }
 
-export const graphics = {
+const Graphics = {
 	[GraphicTypes.LowerThird]: {
 		png: 'iVBORw0KGgoAAAANSUhEUgAAAEgAAAA6CAYAAAATBx+NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHTSURBVHgB7ZThUQIxEIUXxwLsQEqwA84K1ArECvQqACtQK2CsQKiAswKhArECoIJzH3kZ1xsQZHT0x/tm3iTZ5HY3m1zMhBB/SV3Xbdcr2oa9R/uL69x1xHHB+bGrz37fNXDdcE0WvrsPfsYxjveHjfVQJ+ZDH4OcZ4idfd7RFuMMmvvZxIHtRrtRHATtukrXo+vJdeKauVbF8rZwdfjJmWvqgn3huqIq2qYcY+4+hOrTDh7Yf2vkcxTGsS2prufT5bpn2tAf2w4c2n4USLjVag0x8AQuLRVoZKkYmJ/AxpPCHDZ3bp83NGE7t1Tcpes4B3H/E/pfrfVxFU7+zPtLxlrHIvjPzOgD9rm3JznGJna9QU3yTYjJwFZZKgYK9sgEb5hYTKRDtTlG4fB7oLil7UZBH8cb5geWCo8bN4wTnssi7ONL9i0Qruol//vCUrJVKMJqbOlGXbOfQbGuqLweGzhlwluTJiV8WDqIdWDu1lWHghjfyh7zqGwL3ykQHjiAk+lnm6X3pwzBkPCCm88nNwp+ivqD7Cf/Tvi2Zz8H3rM23yCjb9yqwnVhvw0fYyGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhBBCCCGEEOLf8w7C6DWBaBx7RQAAAABJRU5ErkJggg==',
 		bgColour: [202, 138, 4],

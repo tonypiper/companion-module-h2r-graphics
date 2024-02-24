@@ -1,87 +1,88 @@
-import { findGraphic } from "./graphics.js"
+import { findGraphic } from './graphics.js'
+import { msToString } from './utils.js'
 
 export function getVariables(graphics, dynamicText) {
-    const variables = []
-    const variableValues = {}
+	const variables = []
+	const variableValues = {}
 
-    graphics.map((graphic) => {
-        const { id, label, contents } = graphicToReadableLabel(graphic)
-        variables.push({
-            variableId: `graphic_${id}_contents`,
-            name: label,
-        })
-        variables.push({
-            variableId: `graphic_${id}_label`,
-            name: label,
-        })
-        variableValues[`graphic_${id}_label`] = graphic.label || id
+	graphics.map((graphic) => {
+		const { id, label, contents } = graphicToReadableLabel(graphic)
+		variables.push({
+			variableId: `graphic_${id}_contents`,
+			name: label,
+		})
+		variables.push({
+			variableId: `graphic_${id}_label`,
+			name: label,
+		})
+		variableValues[`graphic_${id}_label`] = graphic.label || id
 
-        if (['lower_third', 'lower_third_animated'].includes(graphic.type)) {
-            variables.push({
-                variableId: `graphic_${id}_first_line`,
-                name: label,
-            })
-            variableValues[`graphic_${id}_first_line`] = graphic.line_one
-        }
+		if (['lower_third', 'lower_third_animated'].includes(graphic.type)) {
+			variables.push({
+				variableId: `graphic_${id}_first_line`,
+				name: label,
+			})
+			variableValues[`graphic_${id}_first_line`] = graphic.line_one
+		}
 
-        if(['social'].includes(graphic.type)) {
-            variables.push({
-                variableId: `graphic_${id}_author`,
-                name: `Social - Author (${id})`,
-            })
-            variableValues[`graphic_${id}_author`] = graphic.chat.authorDetails.displayName
+		if (['social'].includes(graphic.type)) {
+			variables.push({
+				variableId: `graphic_${id}_author`,
+				name: `Social - Author (${id})`,
+			})
+			variableValues[`graphic_${id}_author`] = graphic.chat.authorDetails.displayName
 
-            variables.push({
-                variableId: `graphic_${id}_author_profile_image_url`,
-                name: `Social - Author Profile Image URL (${id})`,
-            })
-            variableValues[`graphic_${id}_author_profile_image_url`] = graphic.chat.authorDetails.profileImageUrl
+			variables.push({
+				variableId: `graphic_${id}_author_profile_image_url`,
+				name: `Social - Author Profile Image URL (${id})`,
+			})
+			variableValues[`graphic_${id}_author_profile_image_url`] = graphic.chat.authorDetails.profileImageUrl
 
-            variables.push({
-                variableId: `graphic_${id}_source`,
-                name: `Social - Source (${id})`,
-            })
-            variableValues[`graphic_${id}_source`] = graphic.chat.source
-        }
+			variables.push({
+				variableId: `graphic_${id}_source`,
+				name: `Social - Source (${id})`,
+			})
+			variableValues[`graphic_${id}_source`] = graphic.chat.source
+		}
 
-        if (
-            [
-                'time_countdown',
-                'time_countup',
-                'time_to_tod',
-                'big_time_countdown',
-                'big_time_countup',
-                'big_time_to_tod',
-                'utility_speaker_timer',
-            ].includes(graphic.type)
-        ) {
-            variables.push(
-                {
-                    variableId: `graphic_${id}_hh`,
-                    name: `Hours (${id})`,
-                },
-                {
-                    variableId: `graphic_${id}_mm`,
-                    name: `Minutes (${id})`,
-                },
-                {
-                    variableId: `graphic_${id}_ss`,
-                    name: `Seconds (${id})`,
-                }
-            )
-            return startStopTimer(self, graphic)
-        }
-        variableValues[`graphic_${id}_contents`] = replaceWithDataSource(contents, dynamicText)
-    })
-    Object.entries(dynamicText).forEach(([id, val]) => {
-        variables.push({
-            variableId: id,
-            name: id,
-        })
-        variableValues[id] = val
-    })
+		if (
+			[
+				'time_countdown',
+				'time_countup',
+				'time_to_tod',
+				'big_time_countdown',
+				'big_time_countup',
+				'big_time_to_tod',
+				'utility_speaker_timer',
+			].includes(graphic.type)
+		) {
+			variables.push(
+				{
+					variableId: `graphic_${id}_hh`,
+					name: `Hours (${id})`,
+				},
+				{
+					variableId: `graphic_${id}_mm`,
+					name: `Minutes (${id})`,
+				},
+				{
+					variableId: `graphic_${id}_ss`,
+					name: `Seconds (${id})`,
+				}
+			)
+			return startStopTimer(self, graphic)
+		}
+		variableValues[`graphic_${id}_contents`] = replaceWithDataSource(contents, dynamicText)
+	})
+	Object.entries(dynamicText).forEach(([id, val]) => {
+		variables.push({
+			variableId: id,
+			name: id,
+		})
+		variableValues[id] = val
+	})
 
-    return { variables, variableValues }
+	return { variables, variableValues }
 }
 
 export function replaceWithDataSource(text, dynamicText, keepBrackets = false) {
@@ -113,16 +114,15 @@ export function graphicToReadableLabel(graphic) {
 	const id = graphic.id
 	let label
 	let contents
-    
-    const theGraphic = findGraphic(graphic.type);
-    if(theGraphic) {
-        return {
-            id,
-            label: theGraphic.label(graphic),
-            contents: theGraphic.contents(graphic)
-        }
-    }
 
+	const theGraphic = findGraphic(graphic.type)
+	if (theGraphic) {
+		return {
+			id,
+			label: theGraphic.label(graphic),
+			contents: theGraphic.contents(graphic),
+		}
+	}
 
 	if (graphic.type === 'lower_third') {
 		label = `${graphic.line_one}, ${graphic.line_two} (Lower third - ${id})`

@@ -14,7 +14,6 @@ const GRAPHIC_STATUS_OPTIONS = [
 export const initFeedbacks = (graphics = []) => {
 	const feedbacks = {}
 
-
 	feedbacks.graphic_status = {
 		type: 'boolean', // Feedbacks can either a simple boolean, or can be an 'advanced' style change (until recently, all feedbacks were 'advanced')
 		name: 'Graphic status',
@@ -42,7 +41,7 @@ export const initFeedbacks = (graphics = []) => {
 		callback(feedback) {
 			const status = graphics.find((graphic) => graphic.id === feedback?.options?.graphicId)?.status
 			// This callback will be called whenever companion wants to check if this feedback is 'active' and should affect the button style
-			return status === feedback.options.status;
+			return status === feedback.options.status
 		},
 	}
 	return feedbacks
@@ -57,5 +56,5 @@ function choices(graphics) {
 				label,
 			}
 		}),
-	];
-} 
+	]
+}

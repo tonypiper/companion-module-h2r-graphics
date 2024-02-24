@@ -1,7 +1,6 @@
 import { combineRgb } from '@companion-module/base'
 import { graphicColours, graphicIcons } from './utils.js'
-import { graphicToReadableLabel, replaceWithDataSource} from './variables.js'
-
+import { graphicToReadableLabel, replaceWithDataSource } from './variables.js'
 
 export const initPresets = (self) => {
 	const presets = {}

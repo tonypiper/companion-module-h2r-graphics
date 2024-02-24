@@ -118,7 +118,10 @@ export const init_http = (instance) => {
 				instance.SELECTED_PROJECT_THEMES = data.projects[instance.config.projectId].themes || {}
 				instance.SELECTED_PROJECT_VARIABLES = data.projects[instance.config.projectId].dynamicText || {}
 
-				const { variables, variableValues } = getVariables(instance.SELECTED_PROJECT_GRAPHICS, instance.SELECTED_PROJECT_VARIABLES)
+				const { variables, variableValues } = getVariables(
+					instance.SELECTED_PROJECT_GRAPHICS,
+					instance.SELECTED_PROJECT_VARIABLES
+				)
 
 				instance.setVariableDefinitions(variables)
 				instance.setVariableValues(variableValues)

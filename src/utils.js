@@ -1,4 +1,4 @@
-import { graphics } from './graphics.js'
+import { findGraphic, graphics } from './graphics.js'
 
 export const msToString = (ms = 0) => {
 	let seconds = ms / 1000
@@ -165,16 +165,11 @@ export const graphicToReadableLabel = (graphic) => {
 }
 
 export const graphicColours = (graphic) => {
-	
-	const theGraphic = graphics[graphic] ? graphics[graphic] : graphics['default']
+	const theGraphic = findGraphic(graphic)
 
 	return { bgColour: theGraphic.bgColour }
 }
 export const graphicIcons = (graphic) => {
-	
-	const theGraphic = graphics[graphic] ? graphics[graphic] : graphics['default']
-
+	const theGraphic = findGraphic(graphic)
 	return { png: theGraphic.png }
 }
-
-

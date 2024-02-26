@@ -1,7 +1,7 @@
 import got from 'got'
 
 import { stringToMS } from './utils.js'
-import { graphicToReadableLabel } from './variables.js'
+import { cueToReadableLabel } from './graphics.js'
 
 const GRAPHIC_STATUS_TOGGLES = [
 	{ id: 'coming', label: 'Show' },
@@ -71,7 +71,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -121,7 +121,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'lower_third').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -163,7 +163,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'lower_third_animated').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -227,7 +227,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'message').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -262,7 +262,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'time').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -344,7 +344,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'big_time').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -429,7 +429,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'image').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -476,7 +476,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'ticker').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -525,7 +525,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'webpage').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -569,7 +569,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_large_text').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -612,7 +612,7 @@ export const actionsV2 = (self) => {
 								'big_time_countup',
 							].includes(c.type)
 						).map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -644,7 +644,7 @@ export const actionsV2 = (self) => {
 								'big_time_countup',
 							].includes(c.type)
 						).map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -676,7 +676,7 @@ export const actionsV2 = (self) => {
 								'big_time_countup',
 							].includes(c.type)
 						).map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -708,7 +708,7 @@ export const actionsV2 = (self) => {
 								'big_time_countup',
 							].includes(c.type)
 						).map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -746,7 +746,7 @@ export const actionsV2 = (self) => {
 						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
 							['utility_speaker_timer', 'time_countdown', 'time_countup'].includes(c.type)
 						).map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -779,7 +779,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_speaker_timer').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -814,7 +814,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_speaker_timer').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -853,7 +853,7 @@ export const actionsV2 = (self) => {
 					id: 'graphicId',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'score').map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -925,7 +925,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -960,7 +960,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -999,7 +999,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -1038,7 +1038,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -1090,7 +1090,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -1130,7 +1130,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,
@@ -1314,7 +1314,7 @@ export const actionsV2 = (self) => {
 					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
 					choices: [
 						...SELECTED_PROJECT_GRAPHICS.map((c) => {
-							const { id, label } = graphicToReadableLabel(c)
+							const { id, label } = cueToReadableLabel(c)
 
 							return {
 								id,

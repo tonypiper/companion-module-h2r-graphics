@@ -1,78 +1,14 @@
-import { findGraphic } from './graphics.js'
-import { msToString } from './utils.js'
+import { findCueType } from './graphics.js'
 
-export function getVariables(graphics, dynamicText) {
+export function getVariables(cues, dynamicText) {
 	const variables = []
 	const variableValues = {}
 
-	graphics.map((graphic) => {
-		const { id, label, contents } = graphicToReadableLabel(graphic)
-		variables.push({
-			variableId: `graphic_${id}_contents`,
-			name: label,
-		})
-		variables.push({
-			variableId: `graphic_${id}_label`,
-			name: label,
-		})
-		variableValues[`graphic_${id}_label`] = graphic.label || id
-
-		if (['lower_third', 'lower_third_animated'].includes(graphic.type)) {
-			variables.push({
-				variableId: `graphic_${id}_first_line`,
-				name: label,
-			})
-			variableValues[`graphic_${id}_first_line`] = graphic.line_one
-		}
-
-		if (['social'].includes(graphic.type)) {
-			variables.push({
-				variableId: `graphic_${id}_author`,
-				name: `Social - Author (${id})`,
-			})
-			variableValues[`graphic_${id}_author`] = graphic.chat.authorDetails.displayName
-
-			variables.push({
-				variableId: `graphic_${id}_author_profile_image_url`,
-				name: `Social - Author Profile Image URL (${id})`,
-			})
-			variableValues[`graphic_${id}_author_profile_image_url`] = graphic.chat.authorDetails.profileImageUrl
-
-			variables.push({
-				variableId: `graphic_${id}_source`,
-				name: `Social - Source (${id})`,
-			})
-			variableValues[`graphic_${id}_source`] = graphic.chat.source
-		}
-
-		if (
-			[
-				'time_countdown',
-				'time_countup',
-				'time_to_tod',
-				'big_time_countdown',
-				'big_time_countup',
-				'big_time_to_tod',
-				'utility_speaker_timer',
-			].includes(graphic.type)
-		) {
-			variables.push(
-				{
-					variableId: `graphic_${id}_hh`,
-					name: `Hours (${id})`,
-				},
-				{
-					variableId: `graphic_${id}_mm`,
-					name: `Minutes (${id})`,
-				},
-				{
-					variableId: `graphic_${id}_ss`,
-					name: `Seconds (${id})`,
-				}
-			)
-			return startStopTimer(self, graphic)
-		}
-		variableValues[`graphic_${id}_contents`] = replaceWithDataSource(contents, dynamicText)
+	cues.forEach((cue) => {
+		const { variables: graphicVariables, variableValues: graphicVariableValues } = getVariablesForCue(cue, dynamicText)
+		console.log('graphicVariables', graphicVariables)
+		variables.push(...graphicVariables)
+		Object.assign(variableValues, graphicVariableValues)
 	})
 	Object.entries(dynamicText).forEach(([id, val]) => {
 		variables.push({
@@ -110,158 +46,82 @@ export function replaceWithDataSource(text, dynamicText, keepBrackets = false) {
 	return array2.join('')
 }
 
-export function graphicToReadableLabel(graphic) {
-	const id = graphic.id
-	let label
-	let contents
+export function getTimerVariables(cue, time) {
+	const { full, hh, mm, ss } = toTimeString(time)
 
-	const theGraphic = findGraphic(graphic.type)
-	if (theGraphic) {
-		return {
-			id,
-			label: theGraphic.label(graphic),
-			contents: theGraphic.contents(graphic),
-		}
-	}
+	return [
+		{
+			variableId: `graphic_${cue.id}_hh`,
+			name: `Hours (${cue.id})`,
+			value: hh,
+		},
+		{
+			variableId: `graphic_${cue.id}_mm`,
+			name: `Minutes (${cue.id})`,
+			value: mm,
+		},
+		{
+			variableId: `graphic_${cue.id}_ss`,
+			name: `Seconds (${cue.id})`,
+			value: ss,
+		},
+		{
+			variableId: `graphic_${cue.id}_hhmmss`,
+			name: `Time (${cue.id})`,
+			value: full,
+		},
+		{
+			variableId: `graphic_${cue.id}_hhmm`,
+			name: `Time (${cue.id})`,
+			value: `${hh}:${mm}`,
+		},
+	]
+}
 
-	if (graphic.type === 'lower_third') {
-		label = `${graphic.line_one}, ${graphic.line_two} (Lower third - ${id})`
-		contents = `${graphic.line_one}, ${graphic.line_two}`
-	} else if (graphic.type === 'message') {
-		label = `${graphic.body} (Message) - ${id})`
-		contents = `${graphic.body}`
-	} else if (graphic.type === 'time') {
-		if (graphic.timerType === 'to_time_of_day') {
-			label = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft * 1000)
-					: graphic.endTime
-			} (Time - ${id})`
-			contents = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft * 1000)
-					: graphic.endTime
-			}`
-		} else if (graphic.timerType === 'time_of_day') {
-			label = `Current time of day (Time - ${id})`
-			contents = `Current time of day`
-		} else if (graphic.timerType === 'countdown' || graphic.timerType === 'countup') {
-			label = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft)
-					: graphic.duration
-			} (Time - ${id})`
-			contents = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft)
-					: graphic.duration
-			}`
-		} else {
-			label = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft)
-					: graphic.duration
-			} (Time - ${id})`
-			contents = `${
-				graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-					? msToString(graphic.timeLeft)
-					: graphic.duration
-			}`
-		}
-	} else if (graphic.type === 'image') {
-		label = `${graphic.name} (Image - ${id})`
-		contents = `${graphic.name}`
-	} else if (graphic.type === 'image_with_message') {
-		label = `${graphic.body} (Image with Mesage - ${id})`
-		contents = `${graphic.body}`
-	} else if (graphic.type === 'ticker') {
-		label = `${graphic.title} (Ticker - ${id})`
-		contents = `${graphic.title}`
-	} else if (graphic.type === 'social') {
-		label = `Social - ${id}`
-		contents = `${graphic.chat.snippet.displayMessage}`
-	} else if (graphic.type === 'webpage') {
-		label = `${graphic.url} (Webpage - ${id})`
-		contents = `${graphic.url}`
-	} else if (graphic.type === 'score') {
-		label = `Score - ${id}`
-		contents = `Score`
-	} else if (graphic.type === 'lower_third_animated') {
-		label = `${graphic.line_one}, ${graphic.line_two} (LT Animated - ${id})`
-		contents = `${graphic.line_one}, ${graphic.line_two}`
-	} else if (graphic.type === 'big_time') {
-		label = `${
-			graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-				? msToString(graphic.timeLeft)
-				: graphic.duration
-		} (Big timer - ${id})`
-		contents = `${
-			graphic.status === 'onair' || graphic.status === 'coming' || graphic.status === 'going'
-				? msToString(graphic.timeLeft)
-				: graphic.duration
-		}`
-	} else if (graphic.type === 'icon_with_message') {
-		label = `${graphic.body} (Message - ${id})`
-		contents = `${graphic.body}`
-	} else if (graphic.type === 'credits') {
-		label = `${graphic.lead} (Credits - ${id})`
-		contents = `${graphic.lead}`
-	} else if (graphic.type === 'animated_background') {
-		label = `${graphic.animationName} (Animated Background - ${id})`
-		contents = `${graphic.animationName}`
-	} else if (graphic.type === 'video') {
-		label = `${graphic.name} (Video - ${id})`
-		contents = `${graphic.name}`
-	} else if (graphic.type === 'audio') {
-		label = `${graphic.name} (Audio - ${id})`
-		contents = `${graphic.name}`
-	} else if (graphic.type === 'celebration') {
-		label = `${graphic.celebrationType} (Celebration - ${id})`
-		contents = `${graphic.celebrationType}`
-	} else if (graphic.type === 'now_next_then') {
-		label = `${graphic.items[0].sectionTitle} (Now next then - ${id})`
-		contents = `${graphic.items[0].sectionTitle}`
-	} else if (graphic.type === 'qr') {
-		label = `${graphic.message} (QR code - ${id})`
-		contents = `${graphic.message}`
-	} else if (graphic.type === 'map') {
-		label = `Map - ${id}`
-		contents = `Map`
-	} else if (graphic.type === 'checklist') {
-		label = `${graphic.title} (Checklist - ${id})`
-		contents = `${graphic.title}`
-	} else if (graphic.type === 'utility_large_text') {
-		label = `${graphic.text} (Large Text - ${id})`
-		contents = `${graphic.text}`
-	} else if (graphic.type === 'utility_time_of_day') {
-		label = `Time of day (Time of Day - ${id})`
-		contents = `Time of day`
-	} else if (graphic.type === 'utility_pattern') {
-		label = `Pattern - ${id}`
-		contents = `Pattern`
-	} else if (graphic.type === 'utility_speaker_timer') {
-		label = `${msToString(graphic.duration)} (Speaker timer - ${id})`
-		contents = ['running'].includes(graphic.state) ? `${graphic.endAt}` : `${msToString(graphic.duration)}`
-	} else if (graphic.type === 'time_tod') {
-		label = `Time of day (Time of Day - ${id})`
-		contents = `Time of day`
-	} else if (graphic.type === 'time_to_tod') {
-		label = `To time of day (To time of Day - ${id})`
-		contents = `To time of day`
-	} else if (graphic.type === 'time_countdown' || graphic.type === 'big_time_countdown') {
-		label = `${msToString(graphic.duration)} (Countdown timer - ${id})`
-		contents = ['running'].includes(graphic.state) ? `${graphic.endAt}` : `${msToString(graphic.duration)}`
-	} else if (graphic.type === 'time_countup' || graphic.type === 'big_time_countup') {
-		label = `${msToString(graphic.duration)} (Count Up timer - ${id})`
-		contents = ['running'].includes(graphic.state) ? `${graphic.endAt}` : `${msToString(graphic.duration)}`
-	} else {
-		label = `${graphic.type} (${id})`
-		contents = `${graphic.type} (${id})`
-	}
+export function getVariablesForCue(cue, dynamicText) {
+	console.log('cue', cue)
+	const variableValues = {}
+	const variables = []
+
+	const graphicType = findCueType(cue.type)
+
+	variables.push({
+		variableId: `graphic_${cue.id}_contents`,
+		name: graphicType.label(cue),
+	})
+
+	variableValues[`graphic_${cue.id}_contents`] = replaceWithDataSource(graphicType.contents(cue), dynamicText)
+
+	variables.push({
+		variableId: `graphic_${cue.id}_label`,
+		name: graphicType.label(cue),
+	})
+	variableValues[`graphic_${cue.id}_label`] = cue.label || cue.id
+
+	const extraVariables = graphicType.extraVariables ? graphicType.extraVariables(cue) : []
+	extraVariables.forEach((extraVariable) => {
+		variables.push({ variableId: extraVariable.variableId, name: extraVariable.name })
+		variableValues[extraVariable.variableId] = extraVariable.value
+	})
+
+	console.log('variables', variables)
+	console.log('variableValues', variableValues)
+	return { variables, variableValues }
+}
+
+export const toTimeString = (timeLeft) => {
+	const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24) || 0
+	const minutes = Math.floor((timeLeft / (1000 * 60)) % 60) || 0
+	const seconds = Math.floor((timeLeft / 1000) % 60) || 0
+
+	const hoursString = `${hours < 0 ? '-' : ''}${Math.abs(hours).toString().padStart(2, '0')}`
+	const minutesString = `${Math.abs(minutes).toString().padStart(2, '0')}`
+	const secondsString = `${Math.abs(seconds).toString().padStart(2, '0')}`
 
 	return {
-		id,
-		label,
-		contents,
+		full: `${hoursString}:${minutesString}:${secondsString}`,
+		hh: hoursString,
+		mm: minutesString,
+		ss: secondsString,
 	}
 }

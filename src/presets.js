@@ -1,13 +1,13 @@
 import { combineRgb } from '@companion-module/base'
-import { graphicColours, graphicIcons } from './utils.js'
-import { graphicToReadableLabel, replaceWithDataSource } from './variables.js'
+import { replaceWithDataSource } from './variables.js'
+import { findCueType, cueToReadableLabel } from './graphics.js'
 
-export const initPresets = (self) => {
+export const initPresets = (instance) => {
 	const presets = {}
-	let SELECTED_PROJECT_GRAPHICS = self.SELECTED_PROJECT_GRAPHICS || []
-	let SELECTED_PROJECT_VARIABLES = self.SELECTED_PROJECT_VARIABLES || {}
+	const SELECTED_PROJECT_GRAPHICS = instance.SELECTED_PROJECT_GRAPHICS || []
+	const SELECTED_PROJECT_VARIABLES = instance.SELECTED_PROJECT_VARIABLES || {}
 
-	presets['Run'] = {
+	presets.Run = {
 		type: 'button',
 		category: 'Basic actions',
 		name: 'Run',
@@ -30,7 +30,7 @@ export const initPresets = (self) => {
 		feedbacks: [],
 	}
 
-	presets['Hide'] = {
+	presets.Hide = {
 		type: 'button',
 		category: 'Basic actions',
 		name: 'Hide all graphics',
@@ -53,24 +53,23 @@ export const initPresets = (self) => {
 		feedbacks: [],
 	}
 
-	const createPresetShowHide = (category, item) => {
-		let bgColour = graphicColours(item.type).bgColour
-		let pngIcon = graphicIcons(item.type).png
-		let labelSource = ['lower_third', 'lower_third_animated'].includes(item.type)
-			? self.config.lowerThirdPresetLabelSource || 'contents'
+	const createPresetShowHide = (category, graphic) => {
+		const graphicsType = findCueType(graphic.type)
+		const labelSource = ['lower_third', 'lower_third_animated'].includes(graphic.type)
+			? instance.config.lowerThirdPresetLabelSource || 'contents'
 			: 'contents'
 
 		return {
 			category,
 			type: 'button',
-			name: replaceWithDataSource(graphicToReadableLabel(item).label, SELECTED_PROJECT_VARIABLES),
+			name: replaceWithDataSource(cueToReadableLabel(graphic).label, SELECTED_PROJECT_VARIABLES),
 			style: {
-				text: `$(${self.config.label}:graphic_${item.id}_${labelSource})`,
-				png64: pngIcon,
+				text: `$(${instance.config.label}:graphic_${graphic.id}_${labelSource})`,
+				png64: graphicsType.png,
 				pngalignment: 'center:center',
-				size: self.config.presetButtonTextSize || '18',
+				size: instance.config.presetButtonTextSize || '18',
 				color: combineRgb(255, 255, 255),
-				bgcolor: combineRgb(bgColour[0], bgColour[1], bgColour[2]),
+				bgcolor: graphicsType.bgColor,
 				latch: false,
 			},
 			steps: [
@@ -78,7 +77,7 @@ export const initPresets = (self) => {
 					down: [
 						{
 							actionId: 'showHide',
-							options: { graphicId: item.id, status: 'toggle' },
+							options: { graphicId: graphic.id, status: 'toggle' },
 						},
 					],
 					up: [],
@@ -88,7 +87,7 @@ export const initPresets = (self) => {
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: item.id,
+						graphicId: graphic.id,
 						status: 'coming',
 					},
 					style: {
@@ -98,7 +97,7 @@ export const initPresets = (self) => {
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: item.id,
+						graphicId: graphic.id,
 						status: 'onair',
 					},
 					style: {
@@ -108,7 +107,7 @@ export const initPresets = (self) => {
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: item.id,
+						graphicId: graphic.id,
 						status: 'going',
 					},
 					style: {

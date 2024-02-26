@@ -1,5 +1,5 @@
 import { combineRgb } from '@companion-module/base'
-import { graphicToReadableLabel } from './variables.js'
+import { cueToReadableLabel } from './graphics.js'
 
 const GRAPHIC_STATUS_OPTIONS = [
 	{ id: 'ready', label: 'Ready' },
@@ -50,7 +50,7 @@ export const initFeedbacks = (graphics = []) => {
 function choices(graphics) {
 	return [
 		...graphics.map((graphic) => {
-			const { id, label } = graphicToReadableLabel(graphic)
+			const { id, label } = cueToReadableLabel(graphic)
 			return {
 				id,
 				label,

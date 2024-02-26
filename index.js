@@ -6,7 +6,6 @@ import { initPresets } from './src/presets.js'
 import { initFeedbacks } from './src/feedback.js'
 
 class H2RGraphicsInstance extends InstanceBase {
-
 	async init(config) {
 		this.config = config
 

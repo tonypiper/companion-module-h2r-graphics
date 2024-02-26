@@ -3,7 +3,8 @@
 	"version": "3.2.0",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "node --max-old-space-size=4000 --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+		"test:update-snapshots": "node --max-old-space-size=4000 --experimental-vm-modules ./node_modules/jest/bin/jest.js --updateSnapshot",
 		"format": "prettier -w .",
 		"lint:raw": "eslint --ext .ts --ext .js --ignore-pattern dist --ignore-pattern pkg",
 		"lint": "yarn lint:raw ."
@@ -21,7 +22,8 @@
 	"devDependencies": {
 		"@companion-module/tools": "^1.4.2",
 		"eslint": "^8.57.0",
-		"eslint-typescript": "^1.1.0"
+		"eslint-typescript": "^1.1.0",
+		"jest": "^29.7.0"
 	},
 	"prettier": "@companion-module/tools/.prettierrc.json",
 	"type": "module"

@@ -25,15 +25,15 @@ export const init_http = (instance) => {
 		instance.log('error', err)
 	})
 
-	socket.on('disconnect', function () {
+	socket.on('disconnect', () => {
 		instance.updateStatus('Disconnected')
 	})
 
-	socket.on('connected', function () {
+	socket.on('connected', () => {
 		instance.updateStatus('ok')
 	})
 
-	socket.on('updateFrontend', function (data) {
+	socket.on('updateFrontend', (data) => {
 		const project = data.projects[instance.config.projectId]
 		if (data.projects === undefined || project === undefined) {
 			instance.updateStatus(`Project "${instance.config.projectId}" not found.`)

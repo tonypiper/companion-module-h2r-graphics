@@ -1,19 +1,54 @@
-import { msToString } from './utils.js'
+import { msToString, stringToMS } from './utils.js'
 import { getTimerVariables } from './variables.js'
 import { combineRgb } from '@companion-module/base'
+import { DateTime, Duration } from 'luxon'
 
+/**
+ * @typedef {import('./types.js').Cue} Cue
+ * @typedef {import('./types.js').CueVariable} CueVariable
+ */
+
+/**
+ *
+ * @param {Cue} cue - the cue to check
+ * @returns {boolean} - whether the cue is on air, coming or going
+ */
 export function isActive(cue) {
 	return ['onair', 'coming', 'going'].includes(cue.status)
 }
 
+/**
+ *
+ * @param {Cue} cue - the cue to check
+ * @returns {boolean} - whether the cue is running
+ */
 export function isRunning(cue) {
 	return ['running'].includes(cue.state)
 }
 
+/**
+ *
+ * @param {Cue} cue - the cue to check
+ * @returns { boolean } - whether the cue is paused or reset
+ */
 export function isPausedOrReset(cue) {
 	return ['paused', 'reset'].includes(cue.state)
 }
 
+/**
+ *
+ * @param {Cue} cue - the cue to check
+ * @returns { boolean } - whether the cue is reset
+ */
+export function isReset(cue) {
+	return ['reset'].includes(cue.state)
+}
+
+/**
+ *
+ * @param {Cue} cue - the cue
+ * @returns {CueVariable} - the cue as a variable
+ */
 export function cueToReadableLabel(cue) {
 	const cueType = findCueType(cue.type)
 	return {
@@ -76,8 +111,14 @@ export const TimerCueTypeIds = [
 	CueTypeIds.BigTimeCountup,
 	CueTypeIds.BigTimeToTod,
 	CueTypeIds.UtilitySpeakerTimer,
+	CueTypeIds.UtilityTimeOfDay,
 ]
 
+/**
+ *
+ * @param {string} type - the type of cue
+ * @returns {CueTypes} - the cue type object
+ */
 export function findCueType(type) {
 	return CueTypes[type] || CueTypes['default']
 }
@@ -130,17 +171,18 @@ export const CueTypes = {
 			return `${isActive(cue) ? msToString(cue.timeLeft) : cue.duration}`
 		},
 		extraVariables(cue) {
-			// TODO - check this: they are new implementations
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
 			if (cue.timerType === TimerType.ToTimeOfDay) {
-				return getTimerVariables(cue, cue.timeLeft * 1000)
+				return DateTime.fromMillis(Number.parseInt(cue.endTimestamp, 10)).diff(DateTime.now())
 			}
 
 			if (cue.timerType === TimerType.TimeOfDay) {
-				const time = new Date().getTime()
-				return getTimerVariables(cue, time)
+				return DateTime.now()
 			}
 
-			return getTimerVariables(cue, cue.timeLeft)
+			return Duration.fromMillis(cue.timeLeft)
 		},
 	},
 
@@ -154,9 +196,10 @@ export const CueTypes = {
 			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
 		},
 		extraVariables(cue) {
-			const time = cue.state === 'reset' ? Number.parseInt(cue.duration, 10) : cue.endAt - new Date().getTime()
-
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			return getTimeForCountdown(cue)
 		},
 	},
 	[CueTypeIds.TimeCountup]: {
@@ -169,8 +212,12 @@ export const CueTypes = {
 			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
 		},
 		extraVariables(cue) {
-			const time = new Date().getTime() - cue.startedAt
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			const now = DateTime.now()
+			const end = DateTime.fromMillis(cue.startedAt)
+			return now.diff(end)
 		},
 	},
 	[CueTypeIds.TimeTod]: {
@@ -183,8 +230,10 @@ export const CueTypes = {
 			return `Time of day`
 		},
 		extraVariables(cue) {
-			const time = new Date().getTime()
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(_cue) {
+			return DateTime.now()
 		},
 	},
 	[CueTypeIds.TimeToTod]: {
@@ -282,8 +331,13 @@ export const CueTypes = {
 			return `${isActive(cue) ? msToString(cue.timeLeft) : cue.duration}`
 		},
 		extraVariables(cue) {
-			const time = isActive(cue) ? cue.timeLeft : cue.duration
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			if (cue.timerType === TimerType.TimeOfDay) {
+				return DateTime.now()
+			}
+			return isActive(cue) ? Duration.fromMillis(cue.timeLeft) : Duration.fromMillis(cue.durationMS)
 		},
 	},
 	[CueTypeIds.LowerThirdAnimated]: {
@@ -406,8 +460,8 @@ export const CueTypes = {
 		},
 	},
 	[CueTypeIds.Audio]: {
-		png: emptyPNG, //TODO
-		bgColor: combineRgb(0, 0, 0), //TODO
+		png: emptyPNG,
+		bgColor: combineRgb(0, 0, 0),
 		label(cue) {
 			return `${cue.name} (Audio - ${cue.id})`
 		},
@@ -434,6 +488,12 @@ export const CueTypes = {
 		contents(_cue) {
 			return `Time of day`
 		},
+		extraVariables(cue) {
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(_cue) {
+			return DateTime.now()
+		},
 	},
 	[CueTypeIds.UtilityPattern]: {
 		png: emptyPNG,
@@ -455,9 +515,10 @@ export const CueTypes = {
 			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
 		},
 		extraVariables(cue) {
-			const time = cue.state === 'reset' ? Number.parseInt(cue.duration, 10) : cue.endAt - new Date().getTime()
-
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			return getTimeForCountdown(cue)
 		},
 	},
 	[CueTypeIds.BigTimeCountdown]: {
@@ -467,12 +528,13 @@ export const CueTypes = {
 			return `${msToString(cue.duration)} (Countdown timer - ${cue.id})`
 		},
 		contents(cue) {
-			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
+			return `${msToString(this.time(cue))}`
 		},
 		extraVariables(cue) {
-			const time = cue.state === 'reset' ? Number.parseInt(cue.duration, 10) : cue.endAt - new Date().getTime()
-
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			return getTimeForCountdown(cue)
 		},
 	},
 	[CueTypeIds.BigTimeCountup]: {
@@ -485,23 +547,34 @@ export const CueTypes = {
 			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
 		},
 		extraVariables(cue) {
-			const time = new Date().getTime() - cue.startedAt
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			if (cue.state === 'paused') {
+				return cue.pausedTimeElapsed
+			}
+			if (cue.state === 'reset') {
+				return stringToMS(cue.startOffset)
+			}
+			return isRunning(cue) ? new Date().getTime() - cue.startedAt : cue.duration
 		},
 	},
 	[CueTypeIds.BigTimeToTod]: {
 		png: emptyPNG,
 		bgColor: combineRgb(0, 0, 0),
 		label(cue) {
-			return `${msToString(cue.duration)} (Time to time of day - ${cue.id})`
+			return `${cue.endTime} (Time to time of day - ${cue.id})`
 		},
 		contents(cue) {
-			return isRunning(cue) ? `${cue.endAt}` : `${msToString(cue.duration)}`
+			return isRunning(cue) ? `${cue.endTime}` : `${msToString(cue.duration)}`
 		},
 		extraVariables(cue) {
-			const t = new Date(cue?.endTime)?.getTime() || 0
-			const time = t - new Date().getTime()
-			return getTimerVariables(cue, time)
+			return getTimerVariables(cue, this.time(cue))
+		},
+		time(cue) {
+			const now = DateTime.now()
+			const end = DateTime.fromISO(cue.endTime)
+			return end.diff(now)
 		},
 	},
 	default: {
@@ -514,4 +587,17 @@ export const CueTypes = {
 			return `Default`
 		},
 	},
+}
+
+/**
+ *
+ * @param {object} cue - the cue object
+ * @returns {Duration | DateTime } - the time either as a duration or a datetime
+ */
+function getTimeForCountdown(cue) {
+	if (cue.state === 'paused') {
+		return Duration.fromMillis(cue.pausedTimeLeft)
+	}
+
+	return cue.state === 'reset' ? Duration.fromMillis(cue.duration) : DateTime.fromMillis(cue.endAt).diff(DateTime.now())
 }

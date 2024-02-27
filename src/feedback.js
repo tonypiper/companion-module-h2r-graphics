@@ -11,6 +11,10 @@ const GRAPHIC_STATUS_OPTIONS = [
 	{ id: 'offair', label: 'Off air' },
 ]
 
+/**
+ * @typedef {import('./types.js').Cue} Cue
+ */
+
 export const initFeedbacks = (graphics = []) => {
 	const feedbacks = {}
 
@@ -47,6 +51,10 @@ export const initFeedbacks = (graphics = []) => {
 	return feedbacks
 }
 
+/**
+ * @param {Cue[]} graphics - the graphics to create choices for
+ * @returns {object} - the choices for the dropdown
+ */
 function choices(graphics) {
 	return [
 		...graphics.map((graphic) => {

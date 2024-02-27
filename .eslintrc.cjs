@@ -1,5 +1,5 @@
 module.exports = {
-	extends: ['./node_modules/@companion-module/tools/eslint/main.cjs'],
+	extends: ['./node_modules/@companion-module/tools/eslint/main.cjs', 'plugin:jsdoc/recommended'],
 	overrides: [
 		{
 			files: ['tests/**/*.js'],
@@ -8,4 +8,5 @@ module.exports = {
 			},
 		},
 	],
+	plugins: ['jsdoc'],
 }

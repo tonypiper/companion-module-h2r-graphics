@@ -5,7 +5,31 @@ import { actionsV2 } from './src/actions.js'
 import { initPresets } from './src/presets.js'
 import { initFeedbacks } from './src/feedback.js'
 
+/**
+ * @typedef {import('./types.js').Cue} Cue
+ */
+
+/**
+ * @property { object } project
+ * @property { Cue[] } project.cues
+ * @property { object[] } project.media
+ * @property { object } project.themes
+ * @property { object } project.dynamicText
+ */
 class H2RGraphicsInstance extends InstanceBase {
+	constructor() {
+		super()
+
+		this.project = { cues: [], media: [], themes: {}, dynamicText: {} }
+		this.projects = {}
+
+		// Add your graphics property here
+		this.SELECTED_PROJECT_GRAPHICS = []
+		this.SELECTED_PROJECT_MEDIA = []
+		this.SELECTED_PROJECT_THEMES = {}
+		this.SELECTED_PROJECT_VARIABLES = {}
+	}
+
 	async init(config) {
 		this.config = config
 
@@ -97,11 +121,11 @@ class H2RGraphicsInstance extends InstanceBase {
 	}
 
 	updatePresets() {
-		const presets = initPresets(this)
+		const presets = initPresets(this.config, this.project.cues, this.project.dynamicText)
 		this.setPresetDefinitions(presets)
 	}
 	updateFeedbacks() {
-		const feedbacks = initFeedbacks(this.SELECTED_PROJECT_GRAPHICS)
+		const feedbacks = initFeedbacks(this.project.cues)
 		this.log('debug', JSON.stringify(feedbacks))
 		this.setFeedbackDefinitions(feedbacks)
 	}

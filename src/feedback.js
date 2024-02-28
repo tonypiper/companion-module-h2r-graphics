@@ -1,5 +1,5 @@
-import { combineRgb } from '@companion-module/base'
 import { cueToReadableLabel } from './graphics.js'
+import { Color } from './constants.js'
 
 const GRAPHIC_STATUS_OPTIONS = [
 	{ id: 'ready', label: 'Ready' },
@@ -15,15 +15,15 @@ const GRAPHIC_STATUS_OPTIONS = [
  * @typedef {import('./types.js').Cue} Cue
  */
 
-export const initFeedbacks = (graphics = []) => {
+export const initFeedbacks = (cues = []) => {
 	const feedbacks = {}
 
 	feedbacks.graphic_status = {
 		type: 'boolean', // Feedbacks can either a simple boolean, or can be an 'advanced' style change (until recently, all feedbacks were 'advanced')
 		name: 'Graphic status',
 		defaultStyle: {
-			bgcolor: combineRgb(255, 0, 0),
-			color: combineRgb(255, 255, 255),
+			bgcolor: Color.Red,
+			color: Color.White,
 		},
 		// options is how the user can choose the condition the feedback activates for
 		options: [
@@ -38,12 +38,12 @@ export const initFeedbacks = (graphics = []) => {
 				type: 'dropdown',
 				label: 'Graphic',
 				id: 'graphicId',
-				default: graphics.length > 0 ? graphics[0].id : '',
-				choices: choices(graphics),
+				default: cues.length > 0 ? cues[0].id : '',
+				choices: choices(cues),
 			},
 		],
 		callback(feedback) {
-			const status = graphics.find((graphic) => graphic.id === feedback?.options?.graphicId)?.status
+			const status = cues.find((cue) => cue.id === feedback?.options?.graphicId)?.status
 			// This callback will be called whenever companion wants to check if this feedback is 'active' and should affect the button style
 			return status === feedback.options.status
 		},
@@ -52,13 +52,13 @@ export const initFeedbacks = (graphics = []) => {
 }
 
 /**
- * @param {Cue[]} graphics - the graphics to create choices for
+ * @param {Cue[]} cues - the graphics to create choices for
  * @returns {object} - the choices for the dropdown
  */
-function choices(graphics) {
+function choices(cues) {
 	return [
-		...graphics.map((graphic) => {
-			const { id, label } = cueToReadableLabel(graphic)
+		...cues.map((cue) => {
+			const { id, label } = cueToReadableLabel(cue)
 			return {
 				id,
 				label,

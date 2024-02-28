@@ -1,4 +1,6 @@
-import { CueTypeIds, TimerCueTypeIds, CueTypes } from '../src/graphics.js'
+import { CueTypeIds, TimerCueTypeIds } from '../src/constants.js'
+import { CueTypes } from '../src/graphics.js'
+import { DateTime, Duration } from 'luxon'
 
 const typeIds = Object.values(CueTypeIds)
 
@@ -19,19 +21,13 @@ describe.each(typeIds)('GraphicType members and structure: %s', (typeId) => {
 	})
 
 	test(`GraphicType returns a label`, () => {
-		const graphic = { id: 1, items: [{ sectionTitle: 'Section Title' }] }
-
 		expect(graphicType.label).toBeDefined()
 		expect(typeof graphicType.label).toBe('function')
-		expect(typeof graphicType.label(graphic)).toBe('string')
+		expect(typeof graphicType.label(testCue)).toBe('string')
 	})
 
 	test('contents is not empty', () => {
-		const contents = graphicType.contents({
-			id: 1,
-			chat: { snippet: { displayMessage: 'display message' } },
-			items: [{ sectionTitle: 'Section Title' }],
-		})
+		const contents = graphicType.contents(testCue)
 		expect(contents).toBeDefined()
 		expect(contents).not.toHaveLength(0)
 	})
@@ -46,12 +42,7 @@ describe.each(typeIds)('GraphicType members and structure: %s', (typeId) => {
 			return
 		}
 
-		const graphic = {
-			id: 1,
-			items: [{ sectionTitle: 'Section Title' }],
-			chat: { authorDetails: { displayName: 'Display Name' } },
-		}
-		const extraVariables = graphicType.extraVariables(graphic)
+		const extraVariables = graphicType.extraVariables(testCue)
 		expect(extraVariables).toBeDefined()
 		expect(extraVariables).not.toHaveLength(0)
 		extraVariables.forEach((extraVariable) => {
@@ -61,3 +52,12 @@ describe.each(typeIds)('GraphicType members and structure: %s', (typeId) => {
 		})
 	})
 })
+
+const testCue = {
+	id: 1,
+	items: [{ sectionTitle: 'Section Title' }],
+	chat: { authorDetails: { displayName: 'Display Name' }, snippet: { displayMessage: 'display message' } },
+	startedAt: DateTime.now().minus(Duration.fromMillis(10000)).toMillis(),
+	duration: 10000,
+	endAt: DateTime.now().plus(Duration.fromMillis(10000)).toMillis(),
+}

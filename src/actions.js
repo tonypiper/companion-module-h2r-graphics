@@ -23,15 +23,11 @@ const GRAPHIC_POSITION_OPTIONS = [
 	{ id: 'br', label: 'Bottom Right' },
 ]
 
-export const actionsV2 = (self) => {
-	let SELECTED_PROJECT_GRAPHICS = self.SELECTED_PROJECT_GRAPHICS || []
-	let SELECTED_PROJECT_MEDIA = self.SELECTED_PROJECT_MEDIA || []
-	let SELECTED_PROJECT_THEMES = self.SELECTED_PROJECT_THEMES || {}
-
+export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) => {
 	const sendHttpMessage = async (cmd = '', body = {}) => {
-		var baseUri = `http://${self.config.host}:${self.config.portV2}/api/${self.config.projectId}`
+		const baseUri = `http://${config.host}:${config.portV2}/api/${config.projectId}`
 
-		self.log('debug', `ATTEMPTING ${baseUri}/${cmd}`)
+		instance.log('debug', `ATTEMPTING ${baseUri}/${cmd}`)
 		await got.post(`${baseUri}/${cmd}`, {
 			json: {
 				...body,
@@ -68,9 +64,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -106,7 +102,7 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				const graphicId = await self.parseVariablesInString(action.options.graphicId || '')
+				const graphicId = await instance.parseVariablesInString(action.options.graphicId || '')
 				sendHttpMessage(`graphic/${graphicId}/update`, {
 					status: action.options.status,
 				})
@@ -120,14 +116,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'lower_third').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'lower_third')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -144,10 +142,10 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let l1 = await self.parseVariablesInString(action.options.line_one || '')
-				let l2 = await self.parseVariablesInString(action.options.line_two || '')
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const l1 = await instance.parseVariablesInString(action.options.line_one || '')
+				const l2 = await instance.parseVariablesInString(action.options.line_two || '')
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					line_one: l1,
 					line_two: l2,
 				}
@@ -162,14 +160,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'lower_third_animated').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'lower_third_animated')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -206,11 +206,11 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let l1 = await self.parseVariablesInString(action.options.line_one || '')
-				let l2 = await self.parseVariablesInString(action.options.line_two || '')
+				const l1 = await instance.parseVariablesInString(action.options.line_one || '')
+				const l2 = await instance.parseVariablesInString(action.options.line_two || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					animationName: action.options.animationName,
 					line_one: l1,
 					line_two: l2,
@@ -226,14 +226,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'message').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'message')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -244,10 +246,10 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let b = await self.parseVariablesInString(action.options.body || '')
+				const b = await instance.parseVariablesInString(action.options.body || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					body: b,
 				}
 				await sendHttpMessage(cmd, body)
@@ -261,14 +263,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'time').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'time')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -303,9 +307,9 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
+				const cmd = `graphic/${action.options.graphicId}/update`
 				let body = {}
-				let d = new Date()
+				const d = new Date()
 				if (action.options.type === 'time_of_day') {
 					body = {
 						timerType: action.options.type,
@@ -343,14 +347,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'big_time').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'big_time')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -397,7 +403,7 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
+				const cmd = `graphic/${action.options.graphicId}/update`
 				let body = {}
 				if (action.options.type === 'countdown') {
 					body = {
@@ -428,14 +434,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'image').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'image')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -448,7 +456,7 @@ export const actionsV2 = (self) => {
 					label: 'Image',
 					id: 'imageFilename',
 					choices: [
-						...SELECTED_PROJECT_MEDIA.map((img) => {
+						...media.map((img) => {
 							return {
 								id: img.filename,
 								label: img.originalname,
@@ -458,8 +466,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					name: action.options.image_name,
 					filename: `${action.options.imageFilename}`,
 				}
@@ -475,14 +483,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'ticker').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'ticker')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -499,11 +509,11 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let t = await self.parseVariablesInString(action.options.title || '')
-				let items = await self.parseVariablesInString(action.options.items || '')
+				const t = await instance.parseVariablesInString(action.options.title || '')
+				const items = await instance.parseVariablesInString(action.options.items || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					title: t,
 					items: items.split('|').map((item, i) => {
 						return {
@@ -524,14 +534,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'webpage').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'webpage')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -548,13 +560,13 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let name = await self.parseVariablesInString(action.options.name || '')
-				let url = await self.parseVariablesInString(action.options.url || '')
+				const name = await instance.parseVariablesInString(action.options.name || '')
+				const url = await instance.parseVariablesInString(action.options.url || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
-					name: name,
-					url: url,
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
+					name,
+					url,
 				}
 
 				await sendHttpMessage(cmd, body)
@@ -568,14 +580,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_large_text').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'utility_large_text')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -586,10 +600,10 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let t = await self.parseVariablesInString(action.options.text || '')
+				const t = await instance.parseVariablesInString(action.options.text || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					text: t,
 				}
 				await sendHttpMessage(cmd, body)
@@ -603,27 +617,29 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
-							[
-								'utility_speaker_timer',
-								'time_countdown',
-								'time_countup',
-								'big_time_countdown',
-								'big_time_countup',
-							].includes(c.type)
-						).map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) =>
+								[
+									'utility_speaker_timer',
+									'time_countdown',
+									'time_countup',
+									'big_time_countdown',
+									'big_time_countup',
+								].includes(c.type),
+							)
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/timer/run`
+				const cmd = `graphic/${action.options.graphicId}/timer/run`
 				await sendHttpMessage(cmd)
 			},
 		},
@@ -635,27 +651,29 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
-							[
-								'utility_speaker_timer',
-								'time_countdown',
-								'time_countup',
-								'big_time_countdown',
-								'big_time_countup',
-							].includes(c.type)
-						).map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) =>
+								[
+									'utility_speaker_timer',
+									'time_countdown',
+									'time_countup',
+									'big_time_countdown',
+									'big_time_countup',
+								].includes(c.type),
+							)
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/timer/reset`
+				const cmd = `graphic/${action.options.graphicId}/timer/reset`
 				await sendHttpMessage(cmd)
 			},
 		},
@@ -667,27 +685,29 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
-							[
-								'utility_speaker_timer',
-								'time_countdown',
-								'time_countup',
-								'big_time_countdown',
-								'big_time_countup',
-							].includes(c.type)
-						).map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) =>
+								[
+									'utility_speaker_timer',
+									'time_countdown',
+									'time_countup',
+									'big_time_countdown',
+									'big_time_countup',
+								].includes(c.type),
+							)
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/timer/pause`
+				const cmd = `graphic/${action.options.graphicId}/timer/pause`
 				await sendHttpMessage(cmd)
 			},
 		},
@@ -699,22 +719,24 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
-							[
-								'utility_speaker_timer',
-								'time_countdown',
-								'time_countup',
-								'big_time_countdown',
-								'big_time_countup',
-							].includes(c.type)
-						).map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) =>
+								[
+									'utility_speaker_timer',
+									'time_countdown',
+									'time_countup',
+									'big_time_countdown',
+									'big_time_countup',
+								].includes(c.type),
+							)
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -728,9 +750,9 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let t = await self.parseVariablesInString(action.options.amount || 0)
+				const t = await instance.parseVariablesInString(action.options.amount || 0)
 
-				let cmd = `graphic/${action.options.graphicId}/timer/jump/${t}`
+				const cmd = `graphic/${action.options.graphicId}/timer/jump/${t}`
 
 				await sendHttpMessage(cmd)
 			},
@@ -743,16 +765,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) =>
-							['utility_speaker_timer', 'time_countdown', 'time_countup'].includes(c.type)
-						).map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => ['utility_speaker_timer', 'time_countdown', 'time_countup'].includes(c.type))
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -763,9 +785,9 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let t = await self.parseVariablesInString(action.options.time || 0)
+				const t = await instance.parseVariablesInString(action.options.time || 0)
 
-				let cmd = `graphic/${action.options.graphicId}/timer/duration/${stringToMS(t) / 1000}`
+				const cmd = `graphic/${action.options.graphicId}/timer/duration/${stringToMS(t) / 1000}`
 
 				await sendHttpMessage(cmd)
 			},
@@ -778,14 +800,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_speaker_timer').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'utility_speaker_timer')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -796,10 +820,10 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let b = await self.parseVariablesInString(action.options.body || '')
+				const b = await instance.parseVariablesInString(action.options.body || '')
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					speakerMessage: b,
 				}
 				await sendHttpMessage(cmd, body)
@@ -813,14 +837,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'utility_speaker_timer').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'utility_speaker_timer')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -835,11 +861,11 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let choice = action.options.status
+				const choice = action.options.status
 
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
-					showSpeakerMessage: String(choice) === 'true' ? true : false,
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
+					showSpeakerMessage: String(choice) === 'true',
 				}
 				await sendHttpMessage(cmd, body)
 			},
@@ -852,14 +878,16 @@ export const actionsV2 = (self) => {
 					label: 'Graphic',
 					id: 'graphicId',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.filter((c) => c.type === 'score').map((c) => {
-							const { id, label } = cueToReadableLabel(c)
+						...cues
+							.filter((c) => c.type === 'score')
+							.map((c) => {
+								const { id, label } = cueToReadableLabel(c)
 
-							return {
-								id,
-								label,
-							}
-						}),
+								return {
+									id,
+									label,
+								}
+							}),
 					],
 				},
 				{
@@ -910,7 +938,7 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/updateScore/${action.options.team}/${action.options.level}/${action.options.type}/${action.options.amount}`
+				const cmd = `graphic/${action.options.graphicId}/updateScore/${action.options.team}/${action.options.level}/${action.options.type}/${action.options.amount}`
 
 				sendHttpMessage(cmd)
 			},
@@ -922,9 +950,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -943,8 +971,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					position: action.options.position,
 				}
 				sendHttpMessage(cmd, body)
@@ -957,9 +985,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -982,8 +1010,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					offsetX: action.options.x,
 				}
 				sendHttpMessage(cmd, body)
@@ -996,9 +1024,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -1021,8 +1049,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					offsetY: action.options.y,
 				}
 				sendHttpMessage(cmd, body)
@@ -1035,9 +1063,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -1071,8 +1099,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					offsetX: action.options.x,
 					offsetY: action.options.y,
 				}
@@ -1087,9 +1115,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -1112,8 +1140,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					scale: action.options.scale,
 				}
 
@@ -1127,9 +1155,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -1144,7 +1172,7 @@ export const actionsV2 = (self) => {
 					label: 'Theme',
 					id: 'theme',
 					choices: [
-						...Object.entries(SELECTED_PROJECT_THEMES).map(([id, theme]) => {
+						...Object.entries(themes).map(([id, theme]) => {
 							return {
 								id,
 								label: theme.name,
@@ -1154,8 +1182,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					theme: action.options.theme,
 				}
 				sendHttpMessage(cmd, body)
@@ -1203,8 +1231,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `updateVariableText/${action.options.variable}`
-				let body = {
+				const cmd = `updateVariableText/${action.options.variable}`
+				const body = {
 					text: action.options.text,
 				}
 
@@ -1240,8 +1268,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `updateVariableList/${action.options.listId}/addRow`
-				let body = {
+				const cmd = `updateVariableList/${action.options.listId}/addRow`
+				const body = {
 					row: [{ value: action.options.colOne }, { value: action.options.colTwo }, { value: action.options.colThree }],
 				}
 
@@ -1294,12 +1322,10 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd
-				if (action.options.nextPreviousNumber === 'next' || action.options.nextPreviousNumber === 'previous') {
-					cmd = `updateVariableList/${action.options.listId}/selectRow/${action.options.nextPreviousNumber}`
-				} else {
-					cmd = `updateVariableList/${action.options.listId}/selectRow/${action.options.number}`
-				}
+				const cmd =
+					action.options.nextPreviousNumber === 'next' || action.options.nextPreviousNumber === 'previous'
+						? `updateVariableList/${action.options.listId}/selectRow/${action.options.nextPreviousNumber}`
+						: `updateVariableList/${action.options.listId}/selectRow/${action.options.number}`
 
 				sendHttpMessage(cmd)
 			},
@@ -1311,9 +1337,9 @@ export const actionsV2 = (self) => {
 					type: 'dropdown',
 					label: 'Graphic',
 					id: 'graphicId',
-					default: SELECTED_PROJECT_GRAPHICS.length > 0 ? SELECTED_PROJECT_GRAPHICS[0].id : '',
+					default: cues.length > 0 ? cues[0].id : '',
 					choices: [
-						...SELECTED_PROJECT_GRAPHICS.map((c) => {
+						...cues.map((c) => {
 							const { id, label } = cueToReadableLabel(c)
 
 							return {
@@ -1365,8 +1391,8 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `graphic/${action.options.graphicId}/update`
-				let body = {
+				const cmd = `graphic/${action.options.graphicId}/update`
+				const body = {
 					transition: action.options.override,
 				}
 
@@ -1383,7 +1409,7 @@ export const actionsV2 = (self) => {
 				},
 			],
 			callback: async (action) => {
-				let cmd = `${action.options.uri}`
+				const cmd = `${action.options.uri}`
 				sendHttpMessage(cmd)
 			},
 		},

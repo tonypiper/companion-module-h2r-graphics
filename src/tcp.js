@@ -41,20 +41,14 @@ export const init_http = (instance) => {
 		}
 
 		instance.updateStatus(`ok`)
-		instance.PROJECTS = data.projects
-		instance.SELECTED_PROJECT_GRAPHICS = project.cues || []
-		instance.SELECTED_PROJECT_MEDIA = project.media || []
-		instance.SELECTED_PROJECT_THEMES = project.themes || {}
-		instance.SELECTED_PROJECT_VARIABLES = project.dynamicText || {}
+		instance.projects = data.projects
+		instance.project = project
 
-		const { variables, variableValues } = getVariables(
-			instance.SELECTED_PROJECT_GRAPHICS,
-			instance.SELECTED_PROJECT_VARIABLES
-		)
+		const { variables, variableValues } = getVariables(instance.project.cues, instance.project.dynamicText)
 
 		instance.setVariableDefinitions(variables)
 		instance.setVariableValues(variableValues)
-		startStopTimers(instance, instance.SELECTED_PROJECT_GRAPHICS)
+		startStopTimers(instance, instance.project.cues)
 
 		instance.updateActions()
 		instance.updatePresets()

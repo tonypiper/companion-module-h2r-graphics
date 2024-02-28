@@ -1,11 +1,9 @@
-import { combineRgb } from '@companion-module/base'
 import { replaceWithDataSource } from './variables.js'
 import { findCueType, cueToReadableLabel } from './graphics.js'
+import { Color, CueTypeIds } from './constants.js'
 
-export const initPresets = (instance) => {
+export const initPresets = (config, cues = [], variables = {}) => {
 	const presets = {}
-	const SELECTED_PROJECT_GRAPHICS = instance.SELECTED_PROJECT_GRAPHICS || []
-	const SELECTED_PROJECT_VARIABLES = instance.SELECTED_PROJECT_VARIABLES || {}
 
 	presets.Run = {
 		type: 'button',
@@ -14,8 +12,8 @@ export const initPresets = (instance) => {
 		style: {
 			text: 'Run',
 			size: '18',
-			color: combineRgb(255, 255, 255),
-			bgcolor: combineRgb(0, 0, 0),
+			color: Color.White,
+			bgcolor: Color.Black,
 		},
 		steps: [
 			{
@@ -37,8 +35,8 @@ export const initPresets = (instance) => {
 		style: {
 			text: 'Hide all',
 			size: '18',
-			color: combineRgb(255, 255, 255),
-			bgcolor: combineRgb(0, 0, 0),
+			color: Color.White,
+			bgcolor: Color.Black,
 		},
 		steps: [
 			{
@@ -53,22 +51,22 @@ export const initPresets = (instance) => {
 		feedbacks: [],
 	}
 
-	const createPresetShowHide = (category, graphic) => {
-		const graphicsType = findCueType(graphic.type)
-		const labelSource = ['lower_third', 'lower_third_animated'].includes(graphic.type)
-			? instance.config.lowerThirdPresetLabelSource || 'contents'
+	const createPresetShowHide = (category, cue) => {
+		const graphicsType = findCueType(cue.type)
+		const labelSource = [CueTypeIds.LowerThird, CueTypeIds.LowerThirdAnimated].includes(cue.type)
+			? config.lowerThirdPresetLabelSource || 'contents'
 			: 'contents'
 
 		return {
 			category,
 			type: 'button',
-			name: replaceWithDataSource(cueToReadableLabel(graphic).label, SELECTED_PROJECT_VARIABLES),
+			name: replaceWithDataSource(cueToReadableLabel(cue).label, variables),
 			style: {
-				text: `$(${instance.config.label}:graphic_${graphic.id}_${labelSource})`,
+				text: `$(${config.label}:graphic_${cue.id}_${labelSource})`,
 				png64: graphicsType.png,
 				pngalignment: 'center:center',
-				size: instance.config.presetButtonTextSize || '18',
-				color: combineRgb(255, 255, 255),
+				size: config.presetButtonTextSize || '18',
+				color: Color.White,
 				bgcolor: graphicsType.bgColor,
 				latch: false,
 			},
@@ -77,7 +75,7 @@ export const initPresets = (instance) => {
 					down: [
 						{
 							actionId: 'showHide',
-							options: { graphicId: graphic.id, status: 'toggle' },
+							options: { graphicId: cue.id, status: 'toggle' },
 						},
 					],
 					up: [],
@@ -87,42 +85,42 @@ export const initPresets = (instance) => {
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: graphic.id,
+						graphicId: cue.id,
 						status: 'coming',
 					},
 					style: {
-						bgcolor: combineRgb(132, 0, 0),
+						bgcolor: Color.Red2,
 					},
 				},
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: graphic.id,
+						graphicId: cue.id,
 						status: 'onair',
 					},
 					style: {
-						bgcolor: combineRgb(255, 0, 0),
+						bgcolor: Color.Red,
 					},
 				},
 				{
 					feedbackId: 'graphic_status',
 					options: {
-						graphicId: graphic.id,
+						graphicId: cue.id,
 						status: 'going',
 					},
 					style: {
-						bgcolor: combineRgb(132, 0, 0),
+						bgcolor: Color.Red2,
 					},
 				},
 			],
 		}
 	}
 
-	SELECTED_PROJECT_GRAPHICS.forEach((graphic) => {
-		if (graphic.type === 'section') return null
-		const preset = createPresetShowHide('Show/Hide', graphic)
+	cues.forEach((cue) => {
+		if (cue.type === 'section') return null
+		const preset = createPresetShowHide('Show/Hide', cue)
 
-		presets[graphic.id] = preset
+		presets[cue.id] = preset
 	})
 
 	return presets

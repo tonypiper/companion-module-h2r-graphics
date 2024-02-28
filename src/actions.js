@@ -2,6 +2,7 @@ import got from 'got'
 
 import { stringToMS } from './utils.js'
 import { cueToReadableLabel } from './graphics.js'
+import { CueTypeIds } from './constants.js'
 
 const GRAPHIC_STATUS_TOGGLES = [
 	{ id: 'coming', label: 'Show' },
@@ -23,7 +24,15 @@ const GRAPHIC_POSITION_OPTIONS = [
 	{ id: 'br', label: 'Bottom Right' },
 ]
 
-export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) => {
+const runResumeTypes = [
+	CueTypeIds.UtilitySpeakerTimer,
+	CueTypeIds.TimeCountdown,
+	CueTypeIds.TimeCountup,
+	CueTypeIds.BigTimeCountdown,
+	CueTypeIds.BigTimeCountup,
+]
+
+export const actionsV2 = (instance, config, graphics = [], media = [], themes = {}) => {
 	const sendHttpMessage = async (cmd = '', body = {}) => {
 		const baseUri = `http://${config.host}:${config.portV2}/api/${config.projectId}`
 
@@ -33,6 +42,33 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 				...body,
 			},
 		})
+	}
+
+	const getChoices = (type = []) => {
+		const typeArray = Array.isArray(type) ? type : [type]
+
+		const filterByType = typeArray.length > 0 ? (c) => typeArray.includes(c.type) : () => true
+
+		return [
+			...graphics.filter(filterByType).map((c) => {
+				const { id, label } = cueToReadableLabel(c)
+
+				return {
+					id,
+					label,
+				}
+			}),
+		]
+	}
+
+	const getGraphicDropdown = (type = []) => {
+		return {
+			type: 'dropdown',
+			label: 'Graphic',
+			id: 'graphicId',
+			default: graphics.length > 0 ? graphics[0].id : '',
+			choices: getChoices(type),
+		}
 	}
 
 	return {
@@ -60,22 +96,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 					default: 'coming',
 					choices: GRAPHIC_STATUS_TOGGLES,
 				},
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 			],
 			callback: async (action) => {
 				sendHttpMessage(`graphic/${action.options.graphicId}/update`, {
@@ -111,23 +132,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentLowerThird: {
 			name: 'Update content - Lower third',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'lower_third')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.LowerThird),
 				{
 					type: 'textinput',
 					label: 'Line one',
@@ -155,23 +160,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentLowerThirdAnimated: {
 			name: 'Update content - Lower Third Animated',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'lower_third_animated')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.LowerThirdAnimated),
 				{
 					type: 'dropdown',
 					label: 'Animation',
@@ -221,23 +210,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentMessage: {
 			name: 'Update content - Message',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'message')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Message),
 				{
 					type: 'textinput',
 					label: 'Message body',
@@ -258,23 +231,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentTime: {
 			name: 'Update content - Time',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'time')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Time),
 				{
 					type: 'dropdown',
 					label: 'Type',
@@ -342,23 +299,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentBigTimer: {
 			name: 'Update content - Big Timer',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'big_time')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.BigTime),
 				{
 					type: 'dropdown',
 					label: 'Shape',
@@ -429,23 +370,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentImage: {
 			name: 'Update content - Image',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'image')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Image),
 				{
 					type: 'textinput',
 					label: 'Name',
@@ -478,23 +403,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentTicker: {
 			name: 'Update content - Ticker',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'ticker')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Ticker),
 				{
 					type: 'textinput',
 					label: 'Title',
@@ -529,23 +438,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentWebpage: {
 			name: 'Update content - Webpage',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'webpage')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Webpage),
 				{
 					type: 'textinput',
 					label: 'Name',
@@ -575,23 +468,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentUtilityLargeText: {
 			name: 'Update content - Large Text (Utility)',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'utility_large_text')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.UtilityLargeText),
 				{
 					type: 'textinput',
 					label: 'Text',
@@ -611,33 +488,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		},
 		speakerTimerRun: {
 			name: 'Run/Resume - Timer',
-			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) =>
-								[
-									'utility_speaker_timer',
-									'time_countdown',
-									'time_countup',
-									'big_time_countdown',
-									'big_time_countup',
-								].includes(c.type),
-							)
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
-			],
+			options: [getGraphicDropdown(runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/run`
 				await sendHttpMessage(cmd)
@@ -645,33 +496,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		},
 		speakerTimerReset: {
 			name: 'Reset - Timer',
-			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) =>
-								[
-									'utility_speaker_timer',
-									'time_countdown',
-									'time_countup',
-									'big_time_countdown',
-									'big_time_countup',
-								].includes(c.type),
-							)
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
-			],
+			options: [getGraphicDropdown(runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/reset`
 				await sendHttpMessage(cmd)
@@ -679,33 +504,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		},
 		speakerTimerPause: {
 			name: 'Pause - Timer',
-			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) =>
-								[
-									'utility_speaker_timer',
-									'time_countdown',
-									'time_countup',
-									'big_time_countdown',
-									'big_time_countup',
-								].includes(c.type),
-							)
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
-			],
+			options: [getGraphicDropdown(runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/pause`
 				await sendHttpMessage(cmd)
@@ -714,31 +513,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		speakerTimerJump: {
 			name: 'Add/Remove time - Timer',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) =>
-								[
-									'utility_speaker_timer',
-									'time_countdown',
-									'time_countup',
-									'big_time_countdown',
-									'big_time_countup',
-								].includes(c.type),
-							)
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(runResumeTypes),
 				{
 					type: 'number',
 					label: 'Amount in seconds (+/-)',
@@ -760,23 +535,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		speakerTimerDuration: {
 			name: 'Set duration - Timer',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => ['utility_speaker_timer', 'time_countdown', 'time_countup'].includes(c.type))
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown([CueTypeIds.UtilitySpeakerTimer, CueTypeIds.TimeCountdown, CueTypeIds.TimeCountup]),
 				{
 					type: 'textinput',
 					label: 'Time (HH:MM:SS)',
@@ -795,23 +554,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		speakerTimerSetMessage: {
 			name: 'Speaker Timer - Set Message to speaker',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'utility_speaker_timer')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.UtilitySpeakerTimer),
 				{
 					type: 'textinput',
 					label: 'Message',
@@ -832,23 +575,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		speakerTimerToggleMessage: {
 			name: 'Speaker Timer - Show/Hide message to speaker',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'utility_speaker_timer')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.UtilitySpeakerTimer),
 				{
 					type: 'dropdown',
 					label: 'Show/Hide',
@@ -873,23 +600,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateContentScoreTotal: {
 			name: 'Update content - Score - Total',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					choices: [
-						...cues
-							.filter((c) => c.type === 'score')
-							.map((c) => {
-								const { id, label } = cueToReadableLabel(c)
-
-								return {
-									id,
-									label,
-								}
-							}),
-					],
-				},
+				getGraphicDropdown(CueTypeIds.Score),
 				{
 					type: 'dropdown',
 					label: 'Team number',
@@ -946,22 +657,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicPosition: {
 			name: 'Update graphic position',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'dropdown',
 					label: 'Position',
@@ -981,22 +677,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicX: {
 			name: 'Update graphic offset X',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'number',
 					label: 'X (-100 to 100)',
@@ -1020,22 +701,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicY: {
 			name: 'Update graphic offset Y',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'number',
 					label: 'Y (-100 to 100)',
@@ -1059,22 +725,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicXY: {
 			name: 'Update graphic offset X & Y',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'number',
 					label: 'X (-100 to 100)',
@@ -1111,22 +762,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicScale: {
 			name: 'Update graphic scale',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'number',
 					label: 'Scale (1 to 500)',
@@ -1151,22 +787,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		updateGraphicTheme: {
 			name: 'Update graphic theme',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'dropdown',
 					label: 'Theme',
@@ -1333,22 +954,7 @@ export const actionsV2 = (instance, config, cues = [], media = [], themes = {}) 
 		setTransitionOverride: {
 			name: 'Set Transition Override',
 			options: [
-				{
-					type: 'dropdown',
-					label: 'Graphic',
-					id: 'graphicId',
-					default: cues.length > 0 ? cues[0].id : '',
-					choices: [
-						...cues.map((c) => {
-							const { id, label } = cueToReadableLabel(c)
-
-							return {
-								id,
-								label,
-							}
-						}),
-					],
-				},
+				getGraphicDropdown(),
 				{
 					type: 'dropdown',
 					label: 'Next/Previous/Number',

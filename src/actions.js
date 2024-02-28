@@ -33,6 +33,11 @@ const runResumeTypes = [
 ]
 
 export const actionsV2 = (instance, config, graphics = [], media = [], themes = {}) => {
+	/**
+	 *
+	 * @param {string} cmd - the command will be appended to the baseUri
+	 * @param {object} body - the object
+	 */
 	const sendHttpMessage = async (cmd = '', body = {}) => {
 		const baseUri = `http://${config.host}:${config.portV2}/api/${config.projectId}`
 
@@ -76,14 +81,14 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 			name: 'Run',
 			options: [],
 			callback: async () => {
-				sendHttpMessage(`run`)
+				await sendHttpMessage(`run`)
 			},
 		},
 		clear: {
 			name: 'Hide all',
 			options: [],
 			callback: async () => {
-				sendHttpMessage(`clear`)
+				await sendHttpMessage(`clear`)
 			},
 		},
 		showHide: {
@@ -99,7 +104,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				getGraphicDropdown(),
 			],
 			callback: async (action) => {
-				sendHttpMessage(`graphic/${action.options.graphicId}/update`, {
+				await sendHttpMessage(`graphic/${action.options.graphicId}/update`, {
 					status: action.options.status,
 				})
 			},
@@ -124,7 +129,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 			],
 			callback: async (action) => {
 				const graphicId = await instance.parseVariablesInString(action.options.graphicId || '')
-				sendHttpMessage(`graphic/${graphicId}/update`, {
+				await sendHttpMessage(`graphic/${graphicId}/update`, {
 					status: action.options.status,
 				})
 			},
@@ -293,7 +298,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					}
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateContentBigTimer: {
@@ -364,7 +369,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					}
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateContentImage: {
@@ -397,7 +402,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					filename: `${action.options.imageFilename}`,
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateContentTicker: {
@@ -651,7 +656,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/updateScore/${action.options.team}/${action.options.level}/${action.options.type}/${action.options.amount}`
 
-				sendHttpMessage(cmd)
+				await sendHttpMessage(cmd)
 			},
 		},
 		updateGraphicPosition: {
@@ -671,7 +676,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				const body = {
 					position: action.options.position,
 				}
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateGraphicX: {
@@ -695,7 +700,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				const body = {
 					offsetX: action.options.x,
 				}
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateGraphicY: {
@@ -719,7 +724,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				const body = {
 					offsetY: action.options.y,
 				}
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateGraphicXY: {
@@ -756,7 +761,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					offsetY: action.options.y,
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateGraphicScale: {
@@ -781,7 +786,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					scale: action.options.scale,
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		updateGraphicTheme: {
@@ -807,7 +812,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				const body = {
 					theme: action.options.theme,
 				}
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		setTextVariable: {
@@ -857,7 +862,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					text: action.options.text,
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		addVariableListItem: {
@@ -894,7 +899,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					row: [{ value: action.options.colOne }, { value: action.options.colTwo }, { value: action.options.colThree }],
 				}
 
-				sendHttpMessage(cmd, body)
+				await sendHttpMessage(cmd, body)
 			},
 		},
 		addVariableSelectRow: {
@@ -948,7 +953,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 						? `updateVariableList/${action.options.listId}/selectRow/${action.options.nextPreviousNumber}`
 						: `updateVariableList/${action.options.listId}/selectRow/${action.options.number}`
 
-				sendHttpMessage(cmd)
+				await sendHttpMessage(cmd)
 			},
 		},
 		setTransitionOverride: {
@@ -1016,7 +1021,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 			],
 			callback: async (action) => {
 				const cmd = `${action.options.uri}`
-				sendHttpMessage(cmd)
+				await sendHttpMessage(cmd)
 			},
 		},
 	}

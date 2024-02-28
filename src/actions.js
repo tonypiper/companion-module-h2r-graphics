@@ -36,6 +36,8 @@ export const actionsV2 = (instance) => {
 	const graphics = instance.project.cues
 	const media = instance.project.media
 	const themes = instance.project.themes
+	const config = instance.config
+	// const config = instance.config
 	/**
 	 *
 	 * @param {string} cmd - the command will be appended to the baseUri

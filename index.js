@@ -10,11 +10,13 @@ import { initFeedbacks } from './src/feedback.js'
  */
 
 /**
- * @property { object } project
- * @property { Cue[] } project.cues
- * @property { object[] } project.media
- * @property { object } project.themes
- * @property { object } project.dynamicText
+ * @augments InstanceBase
+ * @property { object } config - the current config
+ * @property { object } project - The current project
+ * @property { Cue[] } project.cues - The current cues
+ * @property { object[] } project.media - The current media
+ * @property { object } project.themes - The current themes
+ * @property { object } project.dynamicText - The current dynamic text
  */
 class H2RGraphicsInstance extends InstanceBase {
 	constructor(internal) {

@@ -2,7 +2,7 @@ import got from 'got'
 
 import { stringToMS } from './utils.js'
 import { cueToReadableLabel } from './graphics.js'
-import { CueTypeIds } from './constants.js'
+import { CueTypeIds, TimerType } from './constants.js'
 
 const GRAPHIC_STATUS_TOGGLES = [
 	{ id: 'coming', label: 'Show' },
@@ -241,22 +241,22 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					type: 'dropdown',
 					label: 'Type',
 					id: 'type',
-					default: 'time_of_day',
+					default: TimerType.TimeOfDay,
 					choices: [
 						{
-							id: 'time_of_day',
+							id: TimerType.TimeOfDay,
 							label: 'Current time of day',
 						},
 						{
-							id: 'to_time_of_day',
+							id: TimerType.ToTimeOfDay,
 							label: 'To time of day',
 						},
 						{
-							id: 'countdown',
+							id: TimerType.Countdown,
 							label: 'Count down',
 						},
 						{
-							id: 'countup',
+							id: TimerType.Countup,
 							label: 'Count up',
 						},
 					],
@@ -272,24 +272,24 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 				const cmd = `graphic/${action.options.graphicId}/update`
 				let body = {}
 				const d = new Date()
-				if (action.options.type === 'time_of_day') {
+				if (action.options.type === TimerType.TimeOfDay) {
 					body = {
 						timerType: action.options.type,
 					}
-				} else if (action.options.type === 'to_time_of_day') {
+				} else if (action.options.type === TimerType.ToTimeOfDay) {
 					body = {
 						timerType: action.options.type,
 						endTime: action.options.time,
 						timeLeft: stringToMS(action.options.time) - d.getMilliseconds(),
 					}
-				} else if (action.options.type === 'countdown') {
+				} else if (action.options.type === TimerType.Countdown) {
 					body = {
 						timerType: action.options.type,
 						duration: action.options.time,
 						durationMS: stringToMS(action.options.time),
 						timeLeft: stringToMS(action.options.time),
 					}
-				} else if (action.options.type === 'countup') {
+				} else if (action.options.type === TimerType.Countup) {
 					body = {
 						timerType: action.options.type,
 						duration: action.options.time,
@@ -329,14 +329,14 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					type: 'dropdown',
 					label: 'Type',
 					id: 'type',
-					default: 'countdown',
+					default: TimerType.Countdown,
 					choices: [
 						{
-							id: 'countdown',
+							id: TimerType.Countdown,
 							label: 'Count down',
 						},
 						{
-							id: 'countup',
+							id: TimerType.Countup,
 							label: 'Count up',
 						},
 					],
@@ -351,7 +351,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/update`
 				let body = {}
-				if (action.options.type === 'countdown') {
+				if (action.options.type === TimerType.Countdown) {
 					body = {
 						shape: action.options.shape,
 						timerType: action.options.type,
@@ -359,7 +359,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 						durationMS: stringToMS(action.options.time),
 						timeLeft: stringToMS(action.options.time),
 					}
-				} else if (action.options.type === 'countup') {
+				} else if (action.options.type === TimerType.Countup) {
 					body = {
 						shape: action.options.shape,
 						timerType: action.options.type,

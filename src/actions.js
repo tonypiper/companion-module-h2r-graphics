@@ -2,7 +2,7 @@ import got from 'got'
 
 import { stringToMS } from './utils.js'
 import { cueToReadableLabel } from './graphics.js'
-import { CueTypeIds, TimerType } from './constants.js'
+import { CueTypeId, TimerType } from './constants.js'
 
 const GRAPHIC_STATUS_TOGGLES = [
 	{ id: 'coming', label: 'Show' },
@@ -25,14 +25,17 @@ const GRAPHIC_POSITION_OPTIONS = [
 ]
 
 const runResumeTypes = [
-	CueTypeIds.UtilitySpeakerTimer,
-	CueTypeIds.TimeCountdown,
-	CueTypeIds.TimeCountup,
-	CueTypeIds.BigTimeCountdown,
-	CueTypeIds.BigTimeCountup,
+	CueTypeId.UtilitySpeakerTimer,
+	CueTypeId.TimeCountdown,
+	CueTypeId.TimeCountup,
+	CueTypeId.BigTimeCountdown,
+	CueTypeId.BigTimeCountup,
 ]
 
-export const actionsV2 = (instance, config, graphics = [], media = [], themes = {}) => {
+export const actionsV2 = (instance) => {
+	const graphics = instance.project.cues
+	const media = instance.project.media
+	const themes = instance.project.themes
 	/**
 	 *
 	 * @param {string} cmd - the command will be appended to the baseUri
@@ -49,10 +52,11 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		})
 	}
 
-	const getChoices = (type = []) => {
+	const getChoices = (graphics = [], type = []) => {
 		const typeArray = Array.isArray(type) ? type : [type]
 
 		const filterByType = typeArray.length > 0 ? (c) => typeArray.includes(c.type) : () => true
+		console.log('graphics', graphics)
 
 		return [
 			...graphics.filter(filterByType).map((c) => {
@@ -66,13 +70,16 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		]
 	}
 
-	const getGraphicDropdown = (type = []) => {
+	const getGraphicDropdown = (graphics = [], type = []) => {
+		console.log('graphics', graphics)
+		console.log('type', type)
+
 		return {
 			type: 'dropdown',
 			label: 'Graphic',
 			id: 'graphicId',
 			default: graphics.length > 0 ? graphics[0].id : '',
-			choices: getChoices(type),
+			choices: getChoices(graphics, type),
 		}
 	}
 
@@ -101,7 +108,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 					default: 'coming',
 					choices: GRAPHIC_STATUS_TOGGLES,
 				},
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 			],
 			callback: async (action) => {
 				await sendHttpMessage(`graphic/${action.options.graphicId}/update`, {
@@ -137,7 +144,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentLowerThird: {
 			name: 'Update content - Lower third',
 			options: [
-				getGraphicDropdown(CueTypeIds.LowerThird),
+				getGraphicDropdown(graphics, CueTypeId.LowerThird),
 				{
 					type: 'textinput',
 					label: 'Line one',
@@ -165,7 +172,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentLowerThirdAnimated: {
 			name: 'Update content - Lower Third Animated',
 			options: [
-				getGraphicDropdown(CueTypeIds.LowerThirdAnimated),
+				getGraphicDropdown(graphics, CueTypeId.LowerThirdAnimated),
 				{
 					type: 'dropdown',
 					label: 'Animation',
@@ -215,7 +222,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentMessage: {
 			name: 'Update content - Message',
 			options: [
-				getGraphicDropdown(CueTypeIds.Message),
+				getGraphicDropdown(graphics, CueTypeId.Message),
 				{
 					type: 'textinput',
 					label: 'Message body',
@@ -236,7 +243,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentTime: {
 			name: 'Update content - Time',
 			options: [
-				getGraphicDropdown(CueTypeIds.Time),
+				getGraphicDropdown(graphics, CueTypeId.Time),
 				{
 					type: 'dropdown',
 					label: 'Type',
@@ -304,7 +311,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentBigTimer: {
 			name: 'Update content - Big Timer',
 			options: [
-				getGraphicDropdown(CueTypeIds.BigTime),
+				getGraphicDropdown(graphics, CueTypeId.BigTime),
 				{
 					type: 'dropdown',
 					label: 'Shape',
@@ -375,7 +382,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentImage: {
 			name: 'Update content - Image',
 			options: [
-				getGraphicDropdown(CueTypeIds.Image),
+				getGraphicDropdown(graphics, CueTypeId.Image),
 				{
 					type: 'textinput',
 					label: 'Name',
@@ -408,7 +415,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentTicker: {
 			name: 'Update content - Ticker',
 			options: [
-				getGraphicDropdown(CueTypeIds.Ticker),
+				getGraphicDropdown(graphics, CueTypeId.Ticker),
 				{
 					type: 'textinput',
 					label: 'Title',
@@ -443,7 +450,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentWebpage: {
 			name: 'Update content - Webpage',
 			options: [
-				getGraphicDropdown(CueTypeIds.Webpage),
+				getGraphicDropdown(graphics, CueTypeId.Webpage),
 				{
 					type: 'textinput',
 					label: 'Name',
@@ -473,7 +480,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentUtilityLargeText: {
 			name: 'Update content - Large Text (Utility)',
 			options: [
-				getGraphicDropdown(CueTypeIds.UtilityLargeText),
+				getGraphicDropdown(graphics, CueTypeId.UtilityLargeText),
 				{
 					type: 'textinput',
 					label: 'Text',
@@ -493,7 +500,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		},
 		speakerTimerRun: {
 			name: 'Run/Resume - Timer',
-			options: [getGraphicDropdown(runResumeTypes)],
+			options: [getGraphicDropdown(graphics, runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/run`
 				await sendHttpMessage(cmd)
@@ -501,7 +508,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		},
 		speakerTimerReset: {
 			name: 'Reset - Timer',
-			options: [getGraphicDropdown(runResumeTypes)],
+			options: [getGraphicDropdown(graphics, runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/reset`
 				await sendHttpMessage(cmd)
@@ -509,7 +516,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		},
 		speakerTimerPause: {
 			name: 'Pause - Timer',
-			options: [getGraphicDropdown(runResumeTypes)],
+			options: [getGraphicDropdown(graphics, runResumeTypes)],
 			callback: async (action) => {
 				const cmd = `graphic/${action.options.graphicId}/timer/pause`
 				await sendHttpMessage(cmd)
@@ -518,7 +525,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		speakerTimerJump: {
 			name: 'Add/Remove time - Timer',
 			options: [
-				getGraphicDropdown(runResumeTypes),
+				getGraphicDropdown(graphics, runResumeTypes),
 				{
 					type: 'number',
 					label: 'Amount in seconds (+/-)',
@@ -540,7 +547,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		speakerTimerDuration: {
 			name: 'Set duration - Timer',
 			options: [
-				getGraphicDropdown([CueTypeIds.UtilitySpeakerTimer, CueTypeIds.TimeCountdown, CueTypeIds.TimeCountup]),
+				getGraphicDropdown(graphics, [CueTypeId.UtilitySpeakerTimer, CueTypeId.TimeCountdown, CueTypeId.TimeCountup]),
 				{
 					type: 'textinput',
 					label: 'Time (HH:MM:SS)',
@@ -559,7 +566,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		speakerTimerSetMessage: {
 			name: 'Speaker Timer - Set Message to speaker',
 			options: [
-				getGraphicDropdown(CueTypeIds.UtilitySpeakerTimer),
+				getGraphicDropdown(graphics, CueTypeId.UtilitySpeakerTimer),
 				{
 					type: 'textinput',
 					label: 'Message',
@@ -580,7 +587,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		speakerTimerToggleMessage: {
 			name: 'Speaker Timer - Show/Hide message to speaker',
 			options: [
-				getGraphicDropdown(CueTypeIds.UtilitySpeakerTimer),
+				getGraphicDropdown(graphics, CueTypeId.UtilitySpeakerTimer),
 				{
 					type: 'dropdown',
 					label: 'Show/Hide',
@@ -605,7 +612,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateContentScoreTotal: {
 			name: 'Update content - Score - Total',
 			options: [
-				getGraphicDropdown(CueTypeIds.Score),
+				getGraphicDropdown(graphics, CueTypeId.Score),
 				{
 					type: 'dropdown',
 					label: 'Team number',
@@ -662,7 +669,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicPosition: {
 			name: 'Update graphic position',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'dropdown',
 					label: 'Position',
@@ -682,7 +689,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicX: {
 			name: 'Update graphic offset X',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'number',
 					label: 'X (-100 to 100)',
@@ -706,7 +713,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicY: {
 			name: 'Update graphic offset Y',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'number',
 					label: 'Y (-100 to 100)',
@@ -730,7 +737,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicXY: {
 			name: 'Update graphic offset X & Y',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'number',
 					label: 'X (-100 to 100)',
@@ -767,7 +774,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicScale: {
 			name: 'Update graphic scale',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'number',
 					label: 'Scale (1 to 500)',
@@ -792,7 +799,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		updateGraphicTheme: {
 			name: 'Update graphic theme',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'dropdown',
 					label: 'Theme',
@@ -959,7 +966,7 @@ export const actionsV2 = (instance, config, graphics = [], media = [], themes = 
 		setTransitionOverride: {
 			name: 'Set Transition Override',
 			options: [
-				getGraphicDropdown(),
+				getGraphicDropdown(graphics),
 				{
 					type: 'dropdown',
 					label: 'Next/Previous/Number',

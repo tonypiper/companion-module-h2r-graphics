@@ -17,25 +17,19 @@ import { initFeedbacks } from './src/feedback.js'
  * @property { object } project.dynamicText
  */
 class H2RGraphicsInstance extends InstanceBase {
-	constructor() {
-		super()
+	constructor(internal) {
+		super(internal)
 
 		this.project = { cues: [], media: [], themes: {}, dynamicText: {} }
 		this.projects = {}
-
-		// Add your graphics property here
-		this.SELECTED_PROJECT_GRAPHICS = []
-		this.SELECTED_PROJECT_MEDIA = []
-		this.SELECTED_PROJECT_THEMES = {}
-		this.SELECTED_PROJECT_VARIABLES = {}
 	}
 
 	async init(config) {
 		this.config = config
 
-		this.updateActions()
-
 		init_http(this)
+
+		this.updateActions()
 	}
 	// When module gets deleted
 	async destroy() {

@@ -1,7 +1,7 @@
 import { msToString, stringToMS } from './utils.js'
 import { getTimerVariables } from './variables.js'
 import { DateTime, Duration } from 'luxon'
-import { Color, Png, CueTypeIds, TimerType } from './constants.js'
+import { Color, Png, CueTypeId, TimerType } from './constants.js'
 
 /**
  * @typedef {import('./types.js').Cue} Cue
@@ -68,7 +68,7 @@ export function findCueType(type) {
 }
 
 export const CueTypes = {
-	[CueTypeIds.LowerThird]: {
+	[CueTypeId.LowerThird]: {
 		png: Png.LowerThird,
 		bgColor: Color.Orange,
 		label(cue) {
@@ -78,7 +78,7 @@ export const CueTypes = {
 			return `${cue.line_one}, ${cue.line_two}`
 		},
 	},
-	[CueTypeIds.Message]: {
+	[CueTypeId.Message]: {
 		png: Png.Message,
 		bgColor: Color.Orange2,
 		label(cue) {
@@ -88,7 +88,7 @@ export const CueTypes = {
 			return `${cue.body}`
 		},
 	},
-	[CueTypeIds.Time]: {
+	[CueTypeId.Time]: {
 		png: Png.Time,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -127,7 +127,7 @@ export const CueTypes = {
 		},
 	},
 
-	[CueTypeIds.TimeCountdown]: {
+	[CueTypeId.TimeCountdown]: {
 		png: Png.Time,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -143,7 +143,7 @@ export const CueTypes = {
 			return getTimeForCountdown(cue)
 		},
 	},
-	[CueTypeIds.TimeCountup]: {
+	[CueTypeId.TimeCountup]: {
 		png: Png.Time,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -161,7 +161,7 @@ export const CueTypes = {
 			return now.diff(end)
 		},
 	},
-	[CueTypeIds.TimeTod]: {
+	[CueTypeId.TimeTod]: {
 		png: Png.Time,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -177,7 +177,7 @@ export const CueTypes = {
 			return DateTime.now()
 		},
 	},
-	[CueTypeIds.TimeToTod]: {
+	[CueTypeId.TimeToTod]: {
 		png: Png.Time,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -193,7 +193,7 @@ export const CueTypes = {
 			return getTimerVariables(cue, time)
 		},
 	},
-	[CueTypeIds.Image]: {
+	[CueTypeId.Image]: {
 		png: Png.Image,
 		bgColor: Color.Blue,
 		label(cue) {
@@ -203,7 +203,7 @@ export const CueTypes = {
 			return `${cue.name}`
 		},
 	},
-	[CueTypeIds.Ticker]: {
+	[CueTypeId.Ticker]: {
 		png: Png.Ticker,
 		bgColor: Color.Blue2,
 		label(cue) {
@@ -213,7 +213,7 @@ export const CueTypes = {
 			return `${cue.title}`
 		},
 	},
-	[CueTypeIds.Social]: {
+	[CueTypeId.Social]: {
 		png: Png.Social,
 		bgColor: Color.Purple,
 		label(cue) {
@@ -242,7 +242,7 @@ export const CueTypes = {
 			]
 		},
 	},
-	[CueTypeIds.Webpage]: {
+	[CueTypeId.Webpage]: {
 		png: Png.Webpage,
 		bgColor: Color.Purple2,
 		label(cue) {
@@ -252,7 +252,7 @@ export const CueTypes = {
 			return `${cue.url}`
 		},
 	},
-	[CueTypeIds.Score]: {
+	[CueTypeId.Score]: {
 		png: Png.Score,
 		bgColor: Color.Green,
 		label(cue) {
@@ -262,7 +262,7 @@ export const CueTypes = {
 			return `Score`
 		},
 	},
-	[CueTypeIds.BigTime]: {
+	[CueTypeId.BigTime]: {
 		png: Png.BigTimer,
 		bgColor: Color.Salmon,
 		label(cue) {
@@ -281,7 +281,7 @@ export const CueTypes = {
 			return isActive(cue) ? Duration.fromMillis(cue.timeLeft) : Duration.fromMillis(cue.durationMS)
 		},
 	},
-	[CueTypeIds.LowerThirdAnimated]: {
+	[CueTypeId.LowerThirdAnimated]: {
 		png: Png.LowerThirdAnimated,
 		bgColor: Color.Yellow,
 		label(cue) {
@@ -300,7 +300,7 @@ export const CueTypes = {
 			]
 		},
 	},
-	[CueTypeIds.IconWithMessage]: {
+	[CueTypeId.IconWithMessage]: {
 		png: Png.IconWithMessage,
 		bgColor: Color.Orange2,
 		label(cue) {
@@ -310,7 +310,7 @@ export const CueTypes = {
 			return `${cue.body}`
 		},
 	},
-	[CueTypeIds.Credits]: {
+	[CueTypeId.Credits]: {
 		png: Png.Credits,
 		bgColor: Color.Green,
 		label(cue) {
@@ -320,7 +320,7 @@ export const CueTypes = {
 			return `${cue.lead}`
 		},
 	},
-	[CueTypeIds.ImageWithMessage]: {
+	[CueTypeId.ImageWithMessage]: {
 		png: Png.ImageWithMessage,
 		bgColor: Color.Brown,
 		label(cue) {
@@ -330,7 +330,7 @@ export const CueTypes = {
 			return `${cue.body}`
 		},
 	},
-	[CueTypeIds.Video]: {
+	[CueTypeId.Video]: {
 		png: Png.Video,
 		bgColor: Color.Purple3,
 		label(cue) {
@@ -340,7 +340,7 @@ export const CueTypes = {
 			return `${cue.name}`
 		},
 	},
-	[CueTypeIds.Celebration]: {
+	[CueTypeId.Celebration]: {
 		png: Png.Celebration,
 		bgColor: Color.Purple4,
 		label(cue) {
@@ -350,7 +350,7 @@ export const CueTypes = {
 			return `${cue.celebrationType}`
 		},
 	},
-	[CueTypeIds.AnimatedBackground]: {
+	[CueTypeId.AnimatedBackground]: {
 		png: Png.AnimatedBackground,
 		bgColor: Color.Blue3,
 		label(cue) {
@@ -360,7 +360,7 @@ export const CueTypes = {
 			return `${cue.animationName}`
 		},
 	},
-	[CueTypeIds.NowNextThen]: {
+	[CueTypeId.NowNextThen]: {
 		png: Png.NowNextThen,
 		bgColor: Color.Green2,
 		label(cue) {
@@ -370,7 +370,7 @@ export const CueTypes = {
 			return `${cue.items[0].sectionTitle}`
 		},
 	},
-	[CueTypeIds.Checklist]: {
+	[CueTypeId.Checklist]: {
 		png: Png.Checklist,
 		bgColor: Color.Purple5,
 		label(cue) {
@@ -380,7 +380,7 @@ export const CueTypes = {
 			return `${cue.title}`
 		},
 	},
-	[CueTypeIds.QR]: {
+	[CueTypeId.QR]: {
 		png: Png.QR,
 		bgColor: Color.Green3,
 		label(cue) {
@@ -390,7 +390,7 @@ export const CueTypes = {
 			return `${cue.message}`
 		},
 	},
-	[CueTypeIds.Map]: {
+	[CueTypeId.Map]: {
 		png: Png.Map,
 		bgColor: Color.Blue4,
 		label(cue) {
@@ -400,7 +400,7 @@ export const CueTypes = {
 			return `Map`
 		},
 	},
-	[CueTypeIds.Audio]: {
+	[CueTypeId.Audio]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -410,7 +410,7 @@ export const CueTypes = {
 			return `${cue.name}`
 		},
 	},
-	[CueTypeIds.UtilityLargeText]: {
+	[CueTypeId.UtilityLargeText]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -420,7 +420,7 @@ export const CueTypes = {
 			return `${cue.text}`
 		},
 	},
-	[CueTypeIds.UtilityTimeOfDay]: {
+	[CueTypeId.UtilityTimeOfDay]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -436,7 +436,7 @@ export const CueTypes = {
 			return DateTime.now()
 		},
 	},
-	[CueTypeIds.UtilityPattern]: {
+	[CueTypeId.UtilityPattern]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -446,7 +446,7 @@ export const CueTypes = {
 			return `Pattern`
 		},
 	},
-	[CueTypeIds.UtilitySpeakerTimer]: {
+	[CueTypeId.UtilitySpeakerTimer]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -462,7 +462,7 @@ export const CueTypes = {
 			return getTimeForCountdown(cue)
 		},
 	},
-	[CueTypeIds.BigTimeCountdown]: {
+	[CueTypeId.BigTimeCountdown]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -478,7 +478,7 @@ export const CueTypes = {
 			return getTimeForCountdown(cue)
 		},
 	},
-	[CueTypeIds.BigTimeCountup]: {
+	[CueTypeId.BigTimeCountup]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {
@@ -500,7 +500,7 @@ export const CueTypes = {
 			return isRunning(cue) ? new Date().getTime() - cue.startedAt : cue.duration
 		},
 	},
-	[CueTypeIds.BigTimeToTod]: {
+	[CueTypeId.BigTimeToTod]: {
 		png: Png.empty,
 		bgColor: Color.Black,
 		label(cue) {

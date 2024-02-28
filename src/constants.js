@@ -66,7 +66,7 @@ export const Png = {
 	Map: 'iVBORw0KGgoAAAANSUhEUgAAAEgAAAA6CAYAAAATBx+NAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAADxSURBVHgB7dRhTcRAEMXxKUFAJVQCEg4FHA7qAJwQFBAUgIMrCsAB56B10HtzeU1GwKVNmv8veWl3dvthN52NALAX8zwflH+lL7U31zqPe49fy5qTa7+5PvbKB5ROHrfe+FwO6FsZlzWu5Zqjv8+5Y6zkPrbxkJvVs6vFPDA9npRn5SsPrWmas6cnvQ+q5XsbK7mLbbwrL85nqeefMTlnpS9zeWCj54bYo9JirZ/Xu2dpMd81f8rHcu/4u6XFuljZJi2mVpm02UGvP6XcKQfl0a2UbTS6FdNU2g0AAAAAAAAAAAAAAAAAAAAAAAAAANzSBdGTyjOnDtskAAAAAElFTkSuQmCC',
 }
 
-export const CueTypeIds = {
+export const CueTypeId = {
 	AnimatedBackground: 'animated_background',
 	Audio: 'audio',
 	BigTime: 'big_time',
@@ -109,15 +109,15 @@ export const TimerType = {
 }
 
 export const TimerCueTypeIds = [
-	CueTypeIds.Time,
-	CueTypeIds.TimeCountdown,
-	CueTypeIds.TimeCountup,
-	CueTypeIds.TimeTod,
-	CueTypeIds.TimeToTod,
-	CueTypeIds.BigTime,
-	CueTypeIds.BigTimeCountdown,
-	CueTypeIds.BigTimeCountup,
-	CueTypeIds.BigTimeToTod,
-	CueTypeIds.UtilitySpeakerTimer,
-	CueTypeIds.UtilityTimeOfDay,
+	CueTypeId.Time,
+	CueTypeId.TimeCountdown,
+	CueTypeId.TimeCountup,
+	CueTypeId.TimeTod,
+	CueTypeId.TimeToTod,
+	CueTypeId.BigTime,
+	CueTypeId.BigTimeCountdown,
+	CueTypeId.BigTimeCountup,
+	CueTypeId.BigTimeToTod,
+	CueTypeId.UtilitySpeakerTimer,
+	CueTypeId.UtilityTimeOfDay,
 ]

@@ -1,11 +1,11 @@
-import { CueTypeIds, TimerCueTypeIds } from '../src/constants.js'
+import { CueTypeId, TimerCueTypeIds } from '../src/constants.js'
 import { CueTypes } from '../src/graphics.js'
 import { DateTime, Duration } from 'luxon'
 
-const typeIds = Object.values(CueTypeIds)
+const typeIds = Object.values(CueTypeId)
 
 test('GraphicTypes has the same keys as GraphicTypeIds', () => {
-	expect(CueTypeIds.length).toEqual(CueTypes.length)
+	expect(CueTypeId.length).toEqual(CueTypes.length)
 })
 
 describe.each(typeIds)('GraphicType members and structure: %s', (typeId) => {

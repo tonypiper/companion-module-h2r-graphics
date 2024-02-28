@@ -1,6 +1,6 @@
 import { replaceWithDataSource } from './variables.js'
 import { findCueType, cueToReadableLabel } from './graphics.js'
-import { Color, CueTypeIds } from './constants.js'
+import { Color, CueTypeId } from './constants.js'
 
 export const initPresets = (config, cues = [], variables = {}) => {
 	const presets = {}
@@ -53,7 +53,7 @@ export const initPresets = (config, cues = [], variables = {}) => {
 
 	const createPresetShowHide = (category, cue) => {
 		const graphicsType = findCueType(cue.type)
-		const labelSource = [CueTypeIds.LowerThird, CueTypeIds.LowerThirdAnimated].includes(cue.type)
+		const labelSource = [CueTypeId.LowerThird, CueTypeId.LowerThirdAnimated].includes(cue.type)
 			? config.lowerThirdPresetLabelSource || 'contents'
 			: 'contents'
 

@@ -1,4 +1,5 @@
-import { TimerCueTypeIds, isPausedOrReset, findCueType } from './graphics.js'
+import { isPausedOrReset, findCueType } from './graphics.js'
+import { TimerCueTypeIds } from './constants.js'
 
 /**
  * @typedef {import('./types.js').Cue} Cue
